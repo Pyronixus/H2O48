@@ -123,6 +123,18 @@ function move(direction) {
   }
   if (oldGrid !== JSON.stringify(grid.map((t) => (t ? t.value : null)))) {
     updateView();
+    grid.forEach((tile) => {
+      if (tile?.element) {
+        tile.element.classList.add("tile-moving");
+      }
+    });
+    setTimeout(() => {
+      grid.forEach((tile) => {
+        if (tile?.element) {
+          tile.element.classList.remove("tile-moving");
+        }
+      });
+    }, 260);
     setTimeout(spawnTile, 100);
   }
 }
@@ -264,3 +276,11 @@ if (timeCheckbox) {
 initBackground();
 spawnTile();
 spawnTile();
+
+function reinitBestScore() {
+  if (!confirm("Voulez-vous réinitialiser votre meilleur score ?")) {
+    return;
+  }
+  localStorage.removeItem("bestScore");
+  bestScore.textContent = 0;
+}
