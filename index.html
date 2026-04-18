@@ -99,8 +99,13 @@
             </div>
           </div>
           <div class="param-card-reinitialisation_best-score">
-            <button class="btn-base btnReinitialiserBestScore" onclick="reinitBestScore()">Réinitialiser le meilleur score</button>
-          </div>  
+            <button
+              class="btn-base btnReinitialiserBestScore"
+              onclick="reinitBestScore()"
+            >
+              Réinitialiser le meilleur score
+            </button>
+          </div>
         </div>
       </div>
     </main>
@@ -108,13 +113,14 @@
     <footer>
       <div id="dev-mode">
         <input type="number" id="dev-value" value="2048" />
-        <button class="btn-base" onclick="toggleDevMode()">Mode Dev : OFF</button>
+        <button class="btn-base" onclick="toggleDevMode()">
+          Mode Dev : OFF
+        </button>
         <p
           id="dev-status"
           style="
             color: white;
-            font-size: 12
-            px;
+            font-size: 12 px;
             font-family: bungee;
             margin-top: 5px;
           "
