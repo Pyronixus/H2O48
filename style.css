@@ -259,24 +259,9 @@ main {
 .toggle-switch:hover .toggle-switch__track {
   background: rgba(255, 255, 255, 0.18);
 }
-.toggle-switch__input:focus-visible + .toggle-switch .toggle-switch__track {
-  outline: 2px solid rgba(116, 192, 252, 0.75);
-  outline-offset: 4px;
-}
+
 #settings-play button.btn-base {
-  background: var(--btn-bg, rgba(255, 255, 255, 0.12));
-  border: 1px solid var(--btn-border, rgba(255, 255, 255, 0.25));
-  padding: var(--btn-padding, 12px 22px);
-  border-radius: var(--btn-radius, 14px);
-  font-size: 16px;
-}
-#settings-play button.btn-base:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-#settings-play button.btn-base:active {
-  background: rgba(255, 255, 255, 0.14);
-  transform: translateY(3px);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25);
+  font-size: 14px;
 }
 
 /* ── GAME BOARD ── */
@@ -287,7 +272,7 @@ main {
   background-color: rgba(255, 255, 255, 0.15);
   border: 3px solid rgba(255, 255, 255, 0.3);
   border-radius: 15px;
-  padding: 15px;
+  padding: 10px;
   transition:
     width 0.4s ease,
     height 0.4s ease,
@@ -296,12 +281,13 @@ main {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   grid-template-rows: repeat(6, 1fr);
-  gap: 12px;
+  gap: 8px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   position: relative;
+  touch-action: none; /* Prevents scroll on mobile swipe */
 }
 
-/* ── TILES ── */
+/* ── TILES (Pixel Perfect Positionning) ── */
 .tile {
   display: flex;
   align-items: center;
@@ -325,9 +311,13 @@ main {
     opacity 0.2s ease,
     filter 0.25s ease;
   position: absolute;
-  width: calc((100% / 6) - 12px);
-  height: calc((100% / 6) - 12px);
-  margin: 6px;
+  /* (100% - padding*2 - gap*(cols-1)) / columns */
+  width: calc((100% - 20px - 40px) / 6);
+  height: calc((100% - 20px - 40px) / 6);
+  /* Alignment driven by JS variables — offset by padding (10px) */
+  left: calc(10px + var(--x) * ((100% - 20px - 40px) / 6) + var(--x) * 8px);
+  top: calc(10px + var(--y) * ((100% - 20px - 40px) / 6) + var(--y) * 8px);
+  margin: 0;
   z-index: 10;
   transform-style: preserve-3d;
   will-change: left, top, transform, box-shadow;
@@ -422,14 +412,12 @@ main {
     opacity: 0;
     transform: perspective(900px) scale(0.2) rotate3d(1, 1, 0, 55deg)
       translateY(-18px);
-    filter: blur(8px);
     box-shadow: 0 0 0 rgba(255, 255, 255, 0);
   }
   40% {
     opacity: 1;
     transform: perspective(900px) scale(1.08) rotate3d(1, 1, 0, -5deg)
       translateY(0);
-    filter: blur(0);
     box-shadow: 0 0 12px rgba(116, 192, 252, 0.35);
   }
   70% {
@@ -439,7 +427,6 @@ main {
   100% {
     opacity: 1;
     transform: perspective(900px) scale(1) rotate3d(0, 0, 0, 0);
-    filter: blur(0);
     box-shadow:
       inset 0 -4px 0 rgba(0, 0, 0, 0.15),
       0 16px 32px rgba(0, 0, 0, 0.28);
@@ -477,10 +464,12 @@ main {
 .tile-merged {
   animation: tile-fusion 0.42s cubic-bezier(0.25, 1, 0.3, 1);
   filter: saturate(1.12) brightness(1.02);
+  z-index: 20;
 }
 .tile-moving {
   filter: drop-shadow(0 0 16px rgba(116, 192, 252, 0.3));
   transform: translateZ(0) scale(1.005);
+  z-index: 15;
 }
 .tile-empty {
   width: 100%;
@@ -595,13 +584,65 @@ body.settings-open #icon-settings {
   transition: transform 0.1s ease-out;
 }
 
-.btnReinitialiserBestScore {
+/* Style unifié pour les boutons dans le panneau des paramètres */
+#settings-play .action-btn {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 4px 0 rgba(0, 0, 0, 0.15);
+  font-family: "Bungee", sans-serif;
+  justify-content: center;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#settings-play .action-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 6px 0 rgba(0, 0, 0, 0.15);
+}
+
+#settings-play .action-btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ── GAME OVER OVERLAY ── */
+#game-over-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  opacity: 0;
+  animation: fadeIn 0.4s forwards;
+  backdrop-filter: blur(4px);
+}
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+#game-over-overlay h2 {
+  font-size: 40px;
+  margin: 0 0 10px;
+  color: #ff5252;
+  text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+#game-over-overlay p {
+  font-size: 20px;
+  margin: 0 0 20px;
   color: white;
-  background-color: #c62828;
-  border: none;
-  padding: 5px;
-  border-radius: 5px;
-  font-family: "Bungee";
 }
 
 /* ── DEV MODE PANEL ── */
@@ -624,13 +665,11 @@ body.settings-open #icon-settings {
 body.show-debug #dev-mode {
   display: flex;
 }
-
 #dev-mode-top-row {
   display: flex;
   gap: 8px;
   align-items: center;
 }
-
 #dev-value {
   flex: 1;
   padding: 8px 12px;
@@ -649,7 +688,6 @@ body.show-debug #dev-mode {
   border-color: rgba(116, 192, 252, 0.7);
   background: rgba(116, 192, 252, 0.1);
 }
-
 #info-dev-mode {
   background: rgba(116, 192, 252, 0.15);
   border: 1px solid rgba(116, 192, 252, 0.3);
@@ -677,7 +715,6 @@ body.show-debug #dev-mode {
   transform: scale(0.92);
 }
 
-/* ── VPOSSIBLES ── */
 #vPossibles {
   display: none;
   flex-wrap: wrap;
@@ -696,7 +733,6 @@ body.show-debug #dev-mode {
   transform: translateY(0);
 }
 
-/* ── TILE VALUE BUTTONS (dev picker) ── */
 .tile-value-btn {
   font-family: "Bungee", sans-serif;
   font-size: 11px;
@@ -760,7 +796,6 @@ body.show-debug #dev-mode {
   transform: translateY(3px);
   box-shadow: 0 1px 0 #c49c00;
 }
-
 #dev-status {
   font-size: 10px;
   margin: 0;
@@ -768,7 +803,6 @@ body.show-debug #dev-mode {
   opacity: 0.5;
   color: white;
 }
-
 .dev-active .tile-empty {
   cursor: cell;
   background-color: rgba(255, 255, 255, 0.08);
@@ -807,7 +841,6 @@ body.dev-active .tile:hover {
   opacity: 1;
   transform: translateY(-50%) translateX(0);
 }
-
 #visuel-header {
   display: flex;
   align-items: center;
@@ -837,7 +870,6 @@ body.dev-active .tile:hover {
   background: rgba(255, 80, 80, 0.3);
   transform: scale(1.1);
 }
-
 #visuel-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -870,7 +902,6 @@ body.dev-active .tile:hover {
 .visuel-cell:hover {
   background: rgba(255, 255, 255, 0.1);
 }
-
 .visuel-tile {
   width: 40px;
   height: 40px;
@@ -889,7 +920,6 @@ body.dev-active .tile:hover {
 .visuel-tile:hover {
   transform: scale(1.1);
 }
-
 .visuel-info {
   display: flex;
   flex-direction: column;
@@ -904,4 +934,61 @@ body.dev-active .tile:hover {
   font-size: 10px;
   color: rgba(255, 255, 255, 0.45);
   font-family: sans-serif;
+}
+
+#game {
+  height: 55vh;
+  width: 55vh;
+  margin: 0 0 48px 0;
+  background-color: rgba(255, 255, 255, 0.15);
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 15px;
+  padding: 10px;
+  transition:
+    width 0.4s ease,
+    height 0.4s ease,
+    margin 0.4s ease,
+    transform 0.4s ease;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(6, 1fr);
+  gap: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  position: relative;
+  touch-action: none;
+  box-sizing: border-box;
+}
+
+.tile {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: bold;
+  border-radius: 18px;
+  box-shadow:
+    inset 0 -4px 0 rgba(0, 0, 0, 0.15),
+    0 18px 40px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  padding: 2px;
+  container-type: inline-size;
+  transition:
+    left 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+    top 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+    background-color 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease,
+    opacity 0.2s ease,
+    filter 0.25s ease;
+  position: absolute;
+  width: calc((100% - 20px - 40px) / 6);
+  height: calc((100% - 20px - 40px) / 6);
+  left: calc(10px + var(--x) * ((100% - 20px - 40px) / 6) + var(--x) * 8px);
+  top: calc(10px + var(--y) * ((100% - 20px - 40px) / 6) + var(--y) * 8px);
+  margin: 0;
+  z-index: 10;
+  transform-style: preserve-3d;
+  will-change: left, top, transform, box-shadow;
 }

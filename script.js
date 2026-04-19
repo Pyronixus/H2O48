@@ -45,12 +45,10 @@ function updateView() {
     if (!tile) return;
     const x = index % GRID_SIZE;
     const y = Math.floor(index / GRID_SIZE);
-    const xPos = (x * 100) / GRID_SIZE;
-    const yPos = (y * 100) / GRID_SIZE;
 
     if (!tile.element) {
       const newtile = document.createElement("div");
-      newtile.classList.add("tile", "tile-" + tile.value, "tile-new");
+      newtile.className = `tile tile-${tile.value} tile-new`;
       const spanTexte = document.createElement("span");
       spanTexte.textContent = tile.value;
       newtile.appendChild(spanTexte);
@@ -60,27 +58,33 @@ function updateView() {
       newtile.addEventListener("mousedown", (e) => {
         if (isDevMode && e.button === 2) {
           e.preventDefault();
-          newtile.remove();
-          grid[index] = null;
+          // Fix : Récupérer dynamiquement l'index car la tuile a pu bouger
+          let currentIndex = grid.indexOf(tile);
+          if (currentIndex !== -1) {
+            newtile.remove();
+            grid[currentIndex] = null;
+          }
           startHoldAction(() => {
-            if (grid[index] !== null) {
-              grid[index].element?.remove();
-              grid[index] = null;
+            let dynIndex = grid.indexOf(tile);
+            if (dynIndex !== -1 && grid[dynIndex] !== null) {
+              grid[dynIndex].element?.remove();
+              grid[dynIndex] = null;
             }
           });
         } else if (!isDevMode && e.button === 0) {
+          newtile.classList.remove("animate-flip");
+          void newtile.offsetWidth; // Force reflow pour relancer l'animation
           newtile.classList.add("animate-flip");
-          setTimeout(() => newtile.classList.remove("animate-flip"), 1000);
         }
       });
 
-      newtile.style.left = `${xPos}%`;
-      newtile.style.top = `${yPos}%`;
+      newtile.style.setProperty("--x", x);
+      newtile.style.setProperty("--y", y);
       wrapper.appendChild(newtile);
       tile.element = newtile;
     } else {
-      tile.element.style.left = `${xPos}%`;
-      tile.element.style.top = `${yPos}%`;
+      tile.element.style.setProperty("--x", x);
+      tile.element.style.setProperty("--y", y);
       tile.element.className = `tile tile-${tile.value}`;
       tile.element.querySelector("span").textContent = tile.value;
       if (tile.merged) {
@@ -105,11 +109,13 @@ function spawnTile() {
   updateView();
 }
 
-function slide(line) {
+function slide(line, indices) {
   let newLine = Array(GRID_SIZE).fill(null);
   let j = 0;
   for (let i = 0; i < line.length; i++) {
     if (line[i] === null) continue;
+
+    // Check Fusion
     if (
       j > 0 &&
       newLine[j - 1] !== null &&
@@ -121,7 +127,18 @@ function slide(line) {
       newLine[j - 1].value = mergeValue;
       newLine[j - 1].merged = true;
       updateScore(mergeValue);
-      setTimeout(() => oldTile.element?.remove(), 100);
+
+      // Fix Visuel : Déplacer l'ancienne tuile vers sa cible avant de la détruire
+      const targetIdx = indices[j - 1];
+      const targetX = targetIdx % GRID_SIZE;
+      const targetY = Math.floor(targetIdx / GRID_SIZE);
+
+      if (oldTile.element) {
+        oldTile.element.style.setProperty("--x", targetX);
+        oldTile.element.style.setProperty("--y", targetY);
+        oldTile.element.style.zIndex = "1";
+        setTimeout(() => oldTile.element.remove(), 250);
+      }
     } else {
       newLine[j] = line[i];
       j++;
@@ -130,8 +147,12 @@ function slide(line) {
   return newLine;
 }
 
+let movingTimeout = null;
+let moveCount = 0;
+
 function move(direction) {
   let oldGrid = JSON.stringify(grid.map((t) => (t ? t.value : null)));
+
   for (let i = 0; i < GRID_SIZE; i++) {
     let line = [];
     let indices = [];
@@ -143,34 +164,105 @@ function move(direction) {
       line.push(grid[idx]);
       indices.push(idx);
     }
-    if (direction === "right" || direction === "down") line.reverse();
-    let result = slide(line);
-    if (direction === "right" || direction === "down") result.reverse();
+
+    if (direction === "right" || direction === "down") {
+      line.reverse();
+      indices.reverse();
+    }
+
+    let result = slide(line, indices);
+
+    if (direction === "right" || direction === "down") {
+      result.reverse();
+      indices.reverse(); // Restaurer l'ordre
+    }
+
     indices.forEach((globalIdx, k) => {
       grid[globalIdx] = result[k];
     });
   }
+
+  // Si le tableau a changé
   if (oldGrid !== JSON.stringify(grid.map((t) => (t ? t.value : null)))) {
+    moveCount++;
     updateView();
     grid.forEach((tile) => {
       if (tile?.element) tile.element.classList.add("tile-moving");
     });
-    setTimeout(() => {
+
+    clearTimeout(movingTimeout); // Fix Spam bug
+    movingTimeout = setTimeout(() => {
       grid.forEach((tile) => {
         if (tile?.element) tile.element.classList.remove("tile-moving");
       });
     }, 260);
-    setTimeout(spawnTile, 100);
+
+    setTimeout(() => {
+      spawnTile();
+      checkGameOver();
+    }, 150);
   }
 }
 
+// Support mobile Swipe
+let touchStartX = 0,
+  touchStartY = 0;
+wrapper.addEventListener(
+  "touchstart",
+  (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+    touchStartY = e.changedTouches[0].screenY;
+  },
+  { passive: true },
+);
+
+wrapper.addEventListener(
+  "touchend",
+  (e) => {
+    let touchEndX = e.changedTouches[0].screenX;
+    let touchEndY = e.changedTouches[0].screenY;
+    let dx = touchEndX - touchStartX;
+    let dy = touchEndY - touchStartY;
+
+    if (Math.abs(dx) > Math.abs(dy)) {
+      if (dx > 40) moveAndStartTimer("right");
+      else if (dx < -40) moveAndStartTimer("left");
+    } else {
+      if (dy > 40) moveAndStartTimer("down");
+      else if (dy < -40) moveAndStartTimer("up");
+    }
+  },
+  { passive: true },
+);
+
+// Support WASD et Flèches
 window.addEventListener("keydown", (e) => {
-  if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
-    e.preventDefault();
-    const timeCheckbox = document.getElementById("toggle-reset-score");
-    if (timeCheckbox && timeCheckbox.checked && timerInterval === null)
-      startTimer();
-    move(e.key.replace("Arrow", "").toLowerCase());
+  if (e.target.tagName === "INPUT") return;
+  const validKeys = [
+    "ArrowUp",
+    "ArrowDown",
+    "ArrowLeft",
+    "ArrowRight",
+    "w",
+    "a",
+    "s",
+    "d",
+    "W",
+    "A",
+    "S",
+    "D",
+  ];
+
+  if (validKeys.includes(e.key)) {
+    if (e.key.startsWith("Arrow")) e.preventDefault();
+
+    let dir = "";
+    if (e.key === "ArrowUp" || e.key.toLowerCase() === "w") dir = "up";
+    if (e.key === "ArrowDown" || e.key.toLowerCase() === "s") dir = "down";
+    if (e.key === "ArrowLeft" || e.key.toLowerCase() === "a") dir = "left";
+    if (e.key === "ArrowRight" || e.key.toLowerCase() === "d") dir = "right";
+
+    moveAndStartTimer(dir);
   }
 });
 
@@ -195,6 +287,7 @@ document.addEventListener("mouseup", clearHoldAction);
 document.addEventListener("mouseleave", clearHoldAction);
 wrapper.addEventListener("contextmenu", (e) => e.preventDefault());
 
+// Cheat Code & Mode Dev
 let isDevMode = false;
 let inputBuffer = "";
 
@@ -233,6 +326,7 @@ function moveAndStartTimer(direction) {
   move(direction);
 }
 
+// Logic Scores et Game Over
 const score = document.getElementById("score-value");
 const bestScore = document.getElementById("best-score-value");
 let currentScore = 0;
@@ -245,6 +339,7 @@ function updateScore(points) {
   void score.offsetWidth;
   score.classList.add("score-pop");
   setTimeout(() => score.classList.remove("score-pop"), 150);
+
   if (currentScore > maxScore) {
     maxScore = currentScore;
     bestScore.textContent = maxScore;
@@ -254,6 +349,50 @@ function updateScore(points) {
   }
 }
 
+function checkGameOver() {
+  if (grid.some((t) => t === null)) return;
+
+  for (let i = 0; i < GRID_SIZE; i++) {
+    for (let j = 0; j < GRID_SIZE; j++) {
+      let idx = i * GRID_SIZE + j;
+      let val = grid[idx].value;
+      if (j < GRID_SIZE - 1 && grid[idx + 1].value === val) return; // Mouvement droite possible
+      if (i < GRID_SIZE - 1 && grid[idx + GRID_SIZE].value === val) return; // Mouvement bas possible
+    }
+  }
+
+  triggerGameOver();
+}
+
+function triggerGameOver() {
+  if (document.getElementById("game-over-overlay")) return;
+  const overlay = document.createElement("div");
+  overlay.id = "game-over-overlay";
+  overlay.innerHTML = `
+    <h2>Game Over</h2>
+    <p>Score final : ${currentScore}</p>
+    <p style="font-size:15px; margin: -8px 0 20px; color: rgba(255,255,255,0.65);">${moveCount} mouvement${moveCount > 1 ? "s" : ""}</p>
+    <button class="btn-base" onclick="restartGame()" style="background-color: #fbc02d; color: #333;">Rejouer</button>
+  `;
+  wrapper.appendChild(overlay);
+}
+
+function restartGame() {
+  grid = Array(GRID_SIZE * GRID_SIZE).fill(null);
+  currentScore = 0;
+  moveCount = 0;
+  score.textContent = currentScore;
+  stopTimer();
+  timeMin = 0;
+  timeSec = 0;
+  updateTimerDisplay();
+
+  document.getElementById("game-over-overlay")?.remove();
+  initBackground();
+  spawnTile();
+  spawnTile();
+}
+
 score.textContent = currentScore;
 bestScore.textContent = maxScore;
 
@@ -261,6 +400,7 @@ function toggleSettings() {
   document.body.classList.toggle("settings-open");
 }
 
+// Timer Logic
 const timeCheckbox = document.getElementById("toggle-reset-score");
 const timeText = document.getElementById("time-txt");
 const timeMinEl = document.getElementById("time-min");
@@ -278,7 +418,7 @@ function startTimer() {
   if (timerInterval !== null) return;
   timerInterval = setInterval(() => {
     timeSec += 1;
-    if (timeSec === 60) {
+    if (timeSec >= 60) {
       timeSec = 0;
       timeMin += 1;
     }
@@ -293,7 +433,7 @@ function stopTimer() {
 }
 
 function setTimerActive(active) {
-  timeText.style.display = active ? "flex" : "none";
+  timeText.style.display = active ? "block" : "none";
   if (!active) {
     stopTimer();
     timeMin = 0;
@@ -312,18 +452,14 @@ if (timeCheckbox) {
   timeText.style.display = "none";
 }
 
-initBackground();
-spawnTile();
-spawnTile();
-
 function reinitBestScore() {
   if (!confirm("Voulez-vous réinitialiser votre meilleur score ?")) return;
   localStorage.removeItem("bestScore");
+  maxScore = 0;
   bestScore.textContent = 0;
 }
 
 let vPossiblesOpen = false;
-
 function vPossiblesDisplay() {
   const el = document.getElementById("vPossibles");
   vPossiblesOpen = !vPossiblesOpen;
@@ -416,12 +552,8 @@ function showVisuelPanel() {
     cell.appendChild(info);
     gridEl.appendChild(cell);
 
-    tile.addEventListener("mouseenter", () => {
-      highlightTilesOnBoard(value);
-    });
-    tile.addEventListener("mouseleave", () => {
-      clearBoardHighlight();
-    });
+    tile.addEventListener("mouseenter", () => highlightTilesOnBoard(value));
+    tile.addEventListener("mouseleave", clearBoardHighlight);
   });
 }
 
@@ -438,11 +570,8 @@ function hideVisuelPanel() {
 function highlightTilesOnBoard(value) {
   grid.forEach((tile) => {
     if (!tile?.element) return;
-    if (tile.value === value) {
-      tile.element.classList.add("visuel-match");
-    } else {
-      tile.element.classList.add("visuel-dim");
-    }
+    if (tile.value === value) tile.element.classList.add("visuel-match");
+    else tile.element.classList.add("visuel-dim");
   });
 }
 
@@ -452,3 +581,8 @@ function clearBoardHighlight() {
     tile.element.classList.remove("visuel-match", "visuel-dim");
   });
 }
+
+// Initialisation du jeu complet
+initBackground();
+spawnTile();
+spawnTile();

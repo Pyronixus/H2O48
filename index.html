@@ -32,7 +32,7 @@
               Meilleur Score : <span id="best-score-value">0</span>
             </h1>
             <h1 id="time-txt">
-              <span id="time-min"></span> : <span id="time-sec"></span>
+              <span id="time-min">00</span> : <span id="time-sec">00</span>
             </h1>
           </div>
         </div>
@@ -87,25 +87,19 @@
           <div class="param-card toggle-control">
             <span class="toggle-control__label">Temps</span>
             <div class="toggle-switch-wrapper">
-              <input
-                type="checkbox"
-                id="toggle-reset-score"
-                class="toggle-switch__input"
-              />
+              <input type="checkbox" id="toggle-reset-score" class="toggle-switch__input" />
               <label class="toggle-switch" for="toggle-reset-score">
                 <span class="toggle-switch__track"></span>
                 <span class="toggle-switch__thumb"></span>
               </label>
             </div>
           </div>
-          <div class="param-card-reinitialisation_best-score">
-            <button
-              class="btn-base btnReinitialiserBestScore"
-              onclick="reinitBestScore()"
-            >
-              Réinitialiser le meilleur score
-            </button>
-          </div>
+          <button class="param-card btn-base action-btn" onclick="restartGame()">
+            Rejouer
+          </button>
+          <button class="param-card btn-base action-btn" onclick="reinitBestScore()">
+            Réinitialiser Record
+          </button>
         </div>
       </div>
     </main>
