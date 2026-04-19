@@ -112,21 +112,17 @@
 
     <footer>
       <div id="dev-mode">
-        <input type="number" id="dev-value" value="2048" />
-        <button class="btn-base" onclick="toggleDevMode()">
+        <div id="dev-mode-top-row">
+          <input type="number" id="dev-value" placeholder="Valeur" />
+          <button id="info-dev-mode" onclick="vPossiblesDisplay()">
+            <i class="fa-solid fa-circle-info"></i>
+          </button>
+        </div>
+        <div id="vPossibles"></div>
+        <button id="btnToggleDev" onclick="toggleDevMode()">
           Mode Dev : OFF
         </button>
-        <p
-          id="dev-status"
-          style="
-            color: white;
-            font-size: 12 px;
-            font-family: bungee;
-            margin-top: 5px;
-          "
-        >
-          Clic Gauche : Placer | Clic Droit : Supprimer <br />
-        </p>
+        <p id="dev-status">Clic Gauche : Placer | Clic Droit : Supprimer</p>
       </div>
     </footer>
     <script src="script.js"></script>
