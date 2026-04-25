@@ -1,4 +1,4 @@
-const GRID_SIZE = 6;
+let GRID_SIZE = 6;
 const wrapper = document.getElementById("game");
 let grid = Array(GRID_SIZE * GRID_SIZE).fill(null);
 
@@ -287,7 +287,6 @@ document.addEventListener("mouseup", clearHoldAction);
 document.addEventListener("mouseleave", clearHoldAction);
 wrapper.addEventListener("contextmenu", (e) => e.preventDefault());
 
-// Cheat Code & Mode Dev
 let isDevMode = false;
 let inputBuffer = "";
 
@@ -378,19 +377,35 @@ function triggerGameOver() {
 }
 
 function restartGame() {
+  // 1. Nettoyage complet du plateau visuel
+  // C'est indispensable pour que les anciennes tuiles disparaissent
+  wrapper.innerHTML = "";
+
+  // 2. Réinitialisation de la logique (le tableau de données)
+  // On utilise la nouvelle valeur de GRID_SIZE
   grid = Array(GRID_SIZE * GRID_SIZE).fill(null);
+
+  // 3. Réinitialisation des compteurs
   currentScore = 0;
   moveCount = 0;
-  score.textContent = currentScore;
+  score.textContent = currentScore; // Mise à jour de l'affichage du score
+
+  // 4. Réinitialisation du Timer
   stopTimer();
   timeMin = 0;
   timeSec = 0;
   updateTimerDisplay();
 
-  document.getElementById("game-over-overlay")?.remove();
-  initBackground();
-  spawnTile();
-  spawnTile();
+  // 5. Suppression de l'écran de Game Over s'il existe
+  const overlay = document.getElementById("game-over-overlay");
+  if (overlay) {
+    overlay.remove();
+  }
+
+  // 6. Reconstruction du jeu
+  initBackground(); // Recrée les emplacements vides (le fond)
+  spawnTile();      // Ajoute la première tuile
+  spawnTile();      // Ajoute la deuxième tuile
 }
 
 score.textContent = currentScore;
@@ -582,6 +597,35 @@ function clearBoardHighlight() {
   });
 }
 
+function changeGridSize() {
+  const leftValue = document.getElementById("value-grid-left");
+  const rightValue = document.getElementById("value-grid-right");
+
+  let currentSize = parseInt(leftValue.textContent);
+
+  if (currentSize < 8) {
+    currentSize += 2;
+  } else {
+    currentSize = 2;
+  }
+
+  leftValue.textContent = currentSize;
+  rightValue.textContent = currentSize;
+
+  GRID_SIZE = currentSize;
+
+  wrapper.style.gridTemplateColumns = `repeat(${GRID_SIZE}, 1fr)`;
+  wrapper.style.gridTemplateRows = `repeat(${GRID_SIZE}, 1fr)`;
+
+  // On cible le carré du jeu
+const gameContainer = document.getElementById("game");
+
+// On ajuste la structure de la grille
+gameContainer.style.gridTemplateColumns = `repeat(${GRID_SIZE}, 1fr)`;
+gameContainer.style.gridTemplateRows = `repeat(${GRID_SIZE}, 1fr)`;
+
+  restartGame();
+}
 // Initialisation du jeu complet
 initBackground();
 spawnTile();
