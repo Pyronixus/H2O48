@@ -404,8 +404,8 @@ function restartGame() {
 
   // 6. Reconstruction du jeu
   initBackground(); // Recrée les emplacements vides (le fond)
-  spawnTile();      // Ajoute la première tuile
-  spawnTile();      // Ajoute la deuxième tuile
+  spawnTile(); // Ajoute la première tuile
+  spawnTile(); // Ajoute la deuxième tuile
 }
 
 score.textContent = currentScore;
@@ -425,8 +425,8 @@ let timeMin = 0;
 let timeSec = 0;
 
 function updateTimerDisplay() {
-  timeMinEl.textContent = String(timeMin).padStart(2, "0");
-  timeSecEl.textContent = String(timeSec).padStart(2, "0");
+  timeMinEl.textContent = String(timeMin).padStart("0") + " min";
+  timeSecEl.textContent = String(timeSec).padStart("0") + " sec";
 }
 
 function startTimer() {
@@ -614,15 +614,10 @@ function changeGridSize() {
 
   GRID_SIZE = currentSize;
 
+  wrapper.style.setProperty("--grid-size", GRID_SIZE);
+
   wrapper.style.gridTemplateColumns = `repeat(${GRID_SIZE}, 1fr)`;
   wrapper.style.gridTemplateRows = `repeat(${GRID_SIZE}, 1fr)`;
-
-  // On cible le carré du jeu
-const gameContainer = document.getElementById("game");
-
-// On ajuste la structure de la grille
-gameContainer.style.gridTemplateColumns = `repeat(${GRID_SIZE}, 1fr)`;
-gameContainer.style.gridTemplateRows = `repeat(${GRID_SIZE}, 1fr)`;
 
   restartGame();
 }

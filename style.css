@@ -289,32 +289,40 @@ main {
 
 /* ── TILES (Pixel Perfect Positionning) ── */
 .tile {
+  box-sizing: border-box; /* Indispensable pour inclure le padding dans la taille */
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 32px;
   font-weight: bold;
-  border-radius: 18px;
+  border-radius: 15px;
   overflow: hidden;
   padding: 2px;
   container-type: inline-size;
+  position: absolute;
+  z-index: 10;
+  transform-style: preserve-3d;
+  will-change: left, top, transform;
+  
+  /* --- CALCULS DYNAMIQUES --- */
+  
+  /* 1. Taille d'une tuile : (Largeur totale - padding wrapper - somme des gaps) / nombre de tuiles */
+  --tile-size: calc((100% - 20px - (var(--grid-size, 6) - 1) * 8px) / var(--grid-size, 6));
+  
+  width: var(--tile-size);
+  height: var(--tile-size);
+
+  /* 2. Position : padding départ + (taille tuile + gap) * index */
+  left: calc(10px + var(--x) * (var(--tile-size) + 8px));
+  top: calc(10px + var(--y) * (var(--tile-size) + 8px));
+
+  /* --- ANIMATIONS --- */
   transition:
     left 0.28s cubic-bezier(0.4, 0, 0.2, 1),
     top 0.28s cubic-bezier(0.4, 0, 0.2, 1),
     transform 0.18s cubic-bezier(0.4, 0, 0.2, 1),
     background-color 0.25s ease,
     opacity 0.2s ease;
-  position: absolute;
-  /* (100% - padding*2 - gap*(cols-1)) / columns */
-  width: calc((100% - 20px - 40px) / 6);
-  height: calc((100% - 20px - 40px) / 6);
-  /* Alignment driven by JS variables — offset by padding (10px) */
-  left: calc(10px + var(--x) * ((100% - 20px - 40px) / 6) + var(--x) * 8px);
-  top: calc(10px + var(--y) * ((100% - 20px - 40px) / 6) + var(--y) * 8px);
-  margin: 0;
-  z-index: 10;
-  transform-style: preserve-3d;
-  will-change: left, top, transform;
 }
 .tile span {
   font-size: clamp(12px, 35cqw, 32px);
@@ -929,32 +937,4 @@ body.dev-active .tile:hover {
   position: relative;
   touch-action: none;
   box-sizing: border-box;
-}
-
-.tile {
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 32px;
-  font-weight: bold;
-  border-radius: 18px;
-  overflow: hidden;
-  padding: 2px;
-  container-type: inline-size;
-  transition:
-    left 0.28s cubic-bezier(0.4, 0, 0.2, 1),
-    top 0.28s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 0.18s cubic-bezier(0.4, 0, 0.2, 1),
-    background-color 0.25s ease,
-    opacity 0.2s ease;
-  position: absolute;
-  width: calc((100% - 20px - 40px) / 6);
-  height: calc((100% - 20px - 40px) / 6);
-  left: calc(10px + var(--x) * ((100% - 20px - 40px) / 6) + var(--x) * 8px);
-  top: calc(10px + var(--y) * ((100% - 20px - 40px) / 6) + var(--y) * 8px);
-  margin: 0;
-  z-index: 10;
-  transform-style: preserve-3d;
-  will-change: left, top, transform;
 }
