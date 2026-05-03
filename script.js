@@ -467,7 +467,7 @@ if (timeCheckbox) {
   timeText.style.display = "none";
 }
 
-function reinitBestScore() {
+function resetBestScore() {
   if (!confirm("Voulez-vous réinitialiser votre meilleur score ?")) return;
   localStorage.removeItem("bestScore");
   maxScore = 0;
@@ -621,6 +621,28 @@ function changeGridSize() {
 
   restartGame();
 }
+
+function reduceHeaderTextSizeForTime(active) {
+  const headerScores = document.getElementById("header-scores");
+  if (active) {
+    headerScores.classList.add("small-header");
+  } else {
+    headerScores.classList.remove("small-header");
+  }
+}
+
+// Mise à jour de la logique existante pour appeler la fonction
+if (timeCheckbox) {
+  timeCheckbox.addEventListener("change", (e) => {
+    const isActive = e.target.checked;
+    setTimerActive(isActive);
+    reduceHeaderTextSizeForTime(isActive); // Appel de la nouvelle fonction
+  });
+  
+  // Initialisation au chargement
+  reduceHeaderTextSizeForTime(timeCheckbox.checked);
+}
+
 // Initialisation du jeu complet
 initBackground();
 spawnTile();

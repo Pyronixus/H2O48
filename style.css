@@ -162,7 +162,7 @@ main {
 #settings-play {
   opacity: 0;
   max-height: 0;
-  overflow: hidden;
+  overflow: visible;
   align-self: flex-start;
   transition:
     opacity 0.3s ease,
@@ -170,6 +170,7 @@ main {
   display: flex;
   flex-direction: column;
   gap: 14px;
+  padding-bottom: 8px;
 }
 .param-card,
 .toggle-control {
@@ -257,7 +258,8 @@ main {
   transform: scale(1.02);
 }
 .toggle-switch:hover .toggle-switch__track {
-  background: rgba(255, 255, 255, 0.18);
+  background-color: rgba(255, 255, 255, 0.3);
+  transition: background-color 0.6s ease;
 }
 
 #settings-play button.btn-base {
@@ -303,12 +305,14 @@ main {
   z-index: 10;
   transform-style: preserve-3d;
   will-change: left, top, transform;
-  
+
   /* --- CALCULS DYNAMIQUES --- */
-  
+
   /* 1. Taille d'une tuile : (Largeur totale - padding wrapper - somme des gaps) / nombre de tuiles */
-  --tile-size: calc((100% - 20px - (var(--grid-size, 6) - 1) * 8px) / var(--grid-size, 6));
-  
+  --tile-size: calc(
+    (100% - 20px - (var(--grid-size, 6) - 1) * 8px) / var(--grid-size, 6)
+  );
+
   width: var(--tile-size);
   height: var(--tile-size);
 
@@ -502,6 +506,15 @@ header {
   align-items: center;
   gap: 32px;
 }
+/* Réduction de la taille quand le timer est présent */
+#header-scores.small-header h1 {
+  font-size: 22px; /* Taille réduite (original: 26px) */
+  margin-right: 25px; /* Espacement réduit */
+}
+#header-scores.small-header {
+  gap: 35px; /* Espace entre Score, Meilleur Score et Time */
+}
+
 #btn-settings {
   position: absolute;
   right: 20px;
@@ -592,6 +605,10 @@ body.settings-open #icon-settings {
   transform: translateY(4px);
   box-shadow: 0 0 0 rgba(0, 0, 0, 0);
   background: rgba(255, 255, 255, 0.1);
+}
+
+#settings-play .action-btn.resetBestScore:hover {
+  color: rgb(255, 23, 23);
 }
 
 /* ── GAME OVER OVERLAY ── */
