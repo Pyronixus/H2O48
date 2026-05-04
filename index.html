@@ -88,21 +88,42 @@
           <div class="param-card toggle-control">
             <span class="toggle-control__label">Temps</span>
             <div class="toggle-switch-wrapper">
-              <input type="checkbox" id="toggle-reset-score" class="toggle-switch__input" />
+              <input
+                type="checkbox"
+                id="toggle-reset-score"
+                class="toggle-switch__input"
+              />
               <label class="toggle-switch" for="toggle-reset-score">
                 <span class="toggle-switch__track"></span>
                 <span class="toggle-switch__thumb"></span>
               </label>
             </div>
           </div>
-          <button class="param-card btn-base action-btn" onclick="restartGame()">
+          <button
+            class="param-card btn-base action-btn"
+            onclick="restartGame()"
+          >
             Rejouer
           </button>
-          <button class="param-card btn-base action-btn resetBestScore" onclick="resetBestScore()">
+          <button
+            class="param-card btn-base action-btn resetBestScore"
+            onclick="resetBestScore()"
+          >
             Réinitialiser Record
           </button>
 
-          <button class="param-card btn-base action-btn" onclick="changeGridSize()">grille : <span id="value-grid-left">6</span>x<span id="value-grid-right">6</span></button>
+          <button
+            class="param-card btn-base action-btn"
+            onclick="changeGridSize()"
+          >
+            grille : <span id="value-grid-left">6</span>x<span
+              id="value-grid-right"
+              >6</span
+            >
+          </button>
+          <button class="param-card btn-base action-btn" onclick="changeGoal()">
+            Objectif : <span id="value-goal">2048</span>
+          </button>
         </div>
       </div>
     </main>

@@ -1,6 +1,7 @@
 let GRID_SIZE = 6;
 const wrapper = document.getElementById("game");
 let grid = Array(GRID_SIZE * GRID_SIZE).fill(null);
+let goalReached = false;
 
 const TILE_DATA = [
   { value: 2, bg: "#e0f7fa", shadow: "#a0d9e2", color: "#555" },
@@ -151,6 +152,14 @@ let movingTimeout = null;
 let moveCount = 0;
 
 function move(direction) {
+  // Si un overlay de victoire ou de défaite est présent, on bloque les mouvements
+  if (
+    document.getElementById("win-overlay") ||
+    document.getElementById("game-over-overlay")
+  ) {
+    return;
+  }
+
   let oldGrid = JSON.stringify(grid.map((t) => (t ? t.value : null)));
 
   for (let i = 0; i < GRID_SIZE; i++) {
@@ -349,22 +358,62 @@ function updateScore(points) {
 }
 
 function checkGameOver() {
+  const goalValue = document.getElementById("value-goal").textContent;
+
+  // 1. Vérification de la Victoire (Seulement si pas encore atteint)
+  if (goalValue !== "∞" && !goalReached) {
+    const target = parseInt(goalValue);
+    if (grid.some((t) => t && t.value === target)) {
+      goalReached = true;
+      stopTimer(); // On arrête le timer pour l'overlay de victoire
+      triggerWin();
+      return; // On sort pour ne pas afficher le Game Over en même temps
+    }
+  }
+
+  // 2. Vérification de la défaite (TOUJOURS exécutée si on n'a pas gagné à cet instant)
+  // On vérifie s'il reste des cases vides
   if (grid.some((t) => t === null)) return;
 
+  // On vérifie s'il reste des fusions possibles
+  let canMove = false;
   for (let i = 0; i < GRID_SIZE; i++) {
     for (let j = 0; j < GRID_SIZE; j++) {
       let idx = i * GRID_SIZE + j;
       let val = grid[idx].value;
-      if (j < GRID_SIZE - 1 && grid[idx + 1].value === val) return; // Mouvement droite possible
-      if (i < GRID_SIZE - 1 && grid[idx + GRID_SIZE].value === val) return; // Mouvement bas possible
+      if (j < GRID_SIZE - 1 && grid[idx + 1].value === val) canMove = true;
+      if (i < GRID_SIZE - 1 && grid[idx + GRID_SIZE].value === val)
+        canMove = true;
     }
   }
 
-  triggerGameOver();
+  // 3. Si aucune case vide ET aucun mouvement possible : Game Over
+  if (!canMove) {
+    stopTimer(); // On arrete le timer peut importe si on a gagné ou pas avant
+    triggerGameOver();
+  }
 }
 
 function triggerGameOver() {
   if (document.getElementById("game-over-overlay")) return;
+
+  stopTimer();
+
+  const currentTimeStr = `${timeMin} min, ${timeSec} sec`;
+  const totalSeconds = timeMin * 60 + timeSec;
+  const goal = document.getElementById("value-goal").textContent;
+
+  // Logic localStorage (inchangée)
+  const recordKey = `bestTime_goal_${goal}`;
+  let bestTime = localStorage.getItem(recordKey);
+  let isNewRecord = false;
+  if (!bestTime || totalSeconds < parseInt(bestTime)) {
+    localStorage.setItem(recordKey, totalSeconds);
+    bestTime = totalSeconds;
+    isNewRecord = true;
+  }
+  const bestTimeDisplay = `${Math.floor(bestTime / 60)} min, ${bestTime % 60} sec`;
+
   const overlay = document.createElement("div");
   overlay.id = "game-over-overlay";
   overlay.innerHTML = `
@@ -375,11 +424,20 @@ function triggerGameOver() {
   `;
   wrapper.appendChild(overlay);
 }
+function continueGame() {
+  const overlay = document.getElementById("win-overlay");
+  if (overlay) overlay.remove();
+  // On relance le timer SEULEMENT si la checkbox est cochée
+  const timeCheckbox = document.getElementById("toggle-reset-score");
+  if (timeCheckbox && timeCheckbox.checked) {
+    startTimer();
+  }
+}
 
 function animateAndRestart(btn) {
   // On ajoute la classe pour l'animation jelly et l'enfoncement
-  btn.classList.add('is-pressing');
-  
+  btn.classList.add("is-pressing");
+
   // On attend un peu (400ms) pour laisser l'effet de gelée se stabiliser
   setTimeout(() => {
     restartGame(); // On relance la logique de réinitialisation
@@ -398,6 +456,7 @@ function restartGame() {
   // 3. Réinitialisation des compteurs
   currentScore = 0;
   moveCount = 0;
+  goalReached = false;
   score.textContent = currentScore; // Mise à jour de l'affichage du score
 
   // 4. Réinitialisation du Timer
@@ -648,9 +707,67 @@ if (timeCheckbox) {
     setTimerActive(isActive);
     reduceHeaderTextSizeForTime(isActive); // Appel de la nouvelle fonction
   });
-  
+
   // Initialisation au chargement
   reduceHeaderTextSizeForTime(timeCheckbox.checked);
+}
+
+function changeGoal() {
+  const goalValue = document.getElementById("value-goal");
+  let currentGoal = goalValue.textContent;
+  let newGoal;
+
+  if (currentGoal === "65536") {
+    newGoal = "∞"; // Si on est au max (65536), on passe à l'infini
+  } else if (currentGoal === "∞") {
+    newGoal = 1024; // Si on est à l'infini, on revient à 1024
+  } else {
+    // Sinon, on multiplie par 2
+    newGoal = parseInt(currentGoal) * 2;
+  }
+
+  goalValue.textContent = newGoal;
+  restartGame();
+}
+
+function triggerWin() {
+  if (document.getElementById("win-overlay")) return;
+  stopTimer();
+
+  const currentTimeStr = `${timeMin} min, ${timeSec} sec`;
+  const totalSeconds = timeMin * 60 + timeSec;
+  const goal = document.getElementById("value-goal").textContent;
+
+  // Gestion du Record de temps via localStorage
+  const recordKey = `bestTime_goal_${goal}`;
+  let bestTime = localStorage.getItem(recordKey);
+  let isNewRecord = false;
+
+  if (!bestTime || totalSeconds < parseInt(bestTime)) {
+    localStorage.setItem(recordKey, totalSeconds);
+    bestTime = totalSeconds;
+    isNewRecord = true;
+  }
+
+  const bestTimeDisplay = `${Math.floor(bestTime / 60)} min, ${bestTime % 60} sec`;
+
+  const overlay = document.createElement("div");
+  overlay.id = "win-overlay";
+  overlay.className = "game-over-overlay win-style"; // On réutilise le style de base
+  overlay.innerHTML = `
+    <h2 style="color: #4caf50;">Objectif Atteint !</h2>
+    <div class="stats-win">
+      <p>🏆 Score final : <strong>${currentScore}</strong></p>
+      <p>👣 Mouvements : <strong>${moveCount}</strong></p>
+      <p>⏱️ Temps : <strong>${currentTimeStr}</strong></p>
+      <p>🥇 Record (${goal}) : <strong>${bestTimeDisplay}</strong> ${isNewRecord ? "✨" : ""}</p>
+    </div>
+    <div class="win-buttons">
+      <button class="win-btn continue" onclick="this.parentElement.parentElement.remove()">Continuer</button>
+      <button class="win-btn restart" onclick="animateAndRestart(this)">Rejouer</button>
+    </div>
+  `;
+  wrapper.appendChild(overlay);
 }
 
 // Initialisation du jeu complet
