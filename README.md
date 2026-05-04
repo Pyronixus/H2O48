@@ -4,17 +4,18 @@ Bienvenue dans **H2O48**, une réinterprétation moderne et fluide du célèbre 
 
 ## ✨ Caractéristiques principales
 
-* **Grille Étendue (6x6)** : Un espace de jeu plus vaste offrant plus de possibilités stratégiques et des scores plus élevés.
+* **Grille Étendue (6x6 par défaut, modifiable)** : Un espace de jeu plus vaste offrant plus de possibilités stratégiques et des scores plus élevés.
 * **Système de Chronomètre** : Un mode optionnel pour suivre votre temps de jeu et ajouter une dimension de défi contre la montre.
+* **Objectifs de tuile** : Choisissez votre tuile "suprême" à atteindre ou jouez chill avec l'objectif infini et dépassez vous avec les records d'objectifs (temps) enregistrés!
 * **Interface Réactive** : Des animations de fusion et d'apparition soignées utilisant des transitions fluides, des filtres et de la perspective 3D.
-* **Sauvegarde Persistante** : Votre meilleur score est conservé localement pour vous permettre de vous dépasser à chaque session.
+* **Sauvegarde Persistante** : Votre meilleur score et vos records d'objectifs sont conservés localement pour vous permettre de vous dépasser à chaque session.
 * **Accessibilité Hybride** : Jouez confortablement au clavier ou via l'interface tactile et les boutons intégrés.
 
 ---
 
 ## 🎮 Comment Jouer ?
 
-Le but est de faire glisser des tuiles numérotées sur une grille pour les combiner et créer une tuile avec le nombre **65 536**.
+Le but est de faire glisser des tuiles numérotées sur une grille pour les combiner et créer une tuile avec le nombre **65 536** (ou tout autre objectif choisit :) ).
 
 1.  **Déplacement** : Utilisez les **touches directionnelles** de votre clavier ou les **boutons fléchés** à l'écran.
 2.  **Fusion** : Lorsque deux tuiles portant le même nombre se touchent, elles fusionnent en une seule dont la valeur est le double.
@@ -22,9 +23,13 @@ Le but est de faire glisser des tuiles numérotées sur une grille pour les comb
 4.  **Score** : Chaque fusion augmente votre score actuel.
 
 ### ⚙️ Paramètres
-En cliquant sur l'icône **engrenage**, vous pouvez accéder aux options suivantes :
+En cliquant sur l'icône **paramètres**, vous pouvez accéder aux options suivantes :
 * **Temps** : Activer ou désactiver l'affichage du chronomètre pour vos parties.
+* **Rejouer** : recommencez votre partie et battez votre record.
 * **Réinitialiser le meilleur score** : Remettre à zéro votre record personnel enregistré dans le navigateur.
+* **Grille** : Choisissez par vous-même la taille de la grille de jeu pour pimenter ou simplifier le gameplay.
+* **Objectifs** : définissez votre objectif de tuile à atteindre et surpassez vos temps pour y parvenir.
+* **...** et bien d'autres ! 
 
 ---
 
@@ -50,9 +55,9 @@ Le projet repose sur une architecture front-end pure (Vanilla JS), garantissant 
 
 ## 🚀 Installation locale
 
-Pour lancer le laboratoire sur votre machine, aucune installation complexe n'est requise :
+Pour lancer le "laboratoire" sur votre machine, aucune installation complexe n'est requise :
 
-1.  Téléchargez les fichiers `index.html`, `style.css` et `script.js`.
+1.  Téléchargez les fichiers le zip via github : ouvrez code puis cliquez sur Download zip ou sinon clonez le dépôt git (https://github.com/Pyronixus/H2O48.git) dans un fichier sur votre ordinateur.
 2.  Ouvrez le fichier `index.html` dans n'importe quel navigateur moderne (Chrome, Firefox, Edge, Safari).
 3.  Fusionnez !
 
