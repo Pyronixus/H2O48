@@ -371,9 +371,19 @@ function triggerGameOver() {
     <h2>Game Over</h2>
     <p>Score final : ${currentScore}</p>
     <p style="font-size:15px; margin: -8px 0 20px; color: rgba(255,255,255,0.65);">${moveCount} mouvement${moveCount > 1 ? "s" : ""}</p>
-    <button class="btn-base" onclick="restartGame()" style="background-color: #fbc02d; color: #333;">Rejouer</button>
+    <button id="restart-btn" onclick="animateAndRestart(this)">Rejouer</button>
   `;
   wrapper.appendChild(overlay);
+}
+
+function animateAndRestart(btn) {
+  // On ajoute la classe pour l'animation jelly et l'enfoncement
+  btn.classList.add('is-pressing');
+  
+  // On attend un peu (400ms) pour laisser l'effet de gelée se stabiliser
+  setTimeout(() => {
+    restartGame(); // On relance la logique de réinitialisation
+  }, 450);
 }
 
 function restartGame() {
