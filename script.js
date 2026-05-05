@@ -22,6 +22,13 @@ const TILE_DATA = [
   { value: 65536, bg: "#000000", shadow: "#00d4ff", color: "#00d4ff" },
 ];
 
+const sounds = {
+  move: new Audio("Assets/Sounds/move.wav"),
+  merge: new Audio("Assets/Sounds/merge.wav"),
+  win: new Audio("Assets/Sounds/win.wav"),
+  gameOver: new Audio("Assets/Sounds/game-over.wav"),
+};
+
 function initBackground() {
   wrapper.innerHTML = "";
   for (let i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
@@ -128,6 +135,7 @@ function slide(line, indices) {
       newLine[j - 1].value = mergeValue;
       newLine[j - 1].merged = true;
       updateScore(mergeValue);
+      playSound("merge");
 
       // Fix Visuel : Déplacer l'ancienne tuile vers sa cible avant de la détruire
       const targetIdx = indices[j - 1];
@@ -194,6 +202,7 @@ function move(direction) {
   // Si le tableau a changé
   if (oldGrid !== JSON.stringify(grid.map((t) => (t ? t.value : null)))) {
     moveCount++;
+    playSound("move");
     updateView();
     grid.forEach((tile) => {
       if (tile?.element) tile.element.classList.add("tile-moving");
@@ -328,7 +337,7 @@ function injectTile(index, value) {
 }
 
 function moveAndStartTimer(direction) {
-  const timeCheckbox = document.getElementById("toggle-reset-score");
+  const timeCheckbox = document.getElementById("toggle-timer");
   if (timeCheckbox && timeCheckbox.checked && timerInterval === null)
     startTimer();
   move(direction);
@@ -396,7 +405,7 @@ function checkGameOver() {
 
 function triggerGameOver() {
   if (document.getElementById("game-over-overlay")) return;
-
+  playSound("gameOver");
   stopTimer();
 
   const currentTimeStr = `${timeMin} min, ${timeSec} sec`;
@@ -428,7 +437,7 @@ function continueGame() {
   const overlay = document.getElementById("win-overlay");
   if (overlay) overlay.remove();
   // On relance le timer SEULEMENT si la checkbox est cochée
-  const timeCheckbox = document.getElementById("toggle-reset-score");
+  const timeCheckbox = document.getElementById("toggle-timer");
   if (timeCheckbox && timeCheckbox.checked) {
     startTimer();
   }
@@ -485,7 +494,7 @@ function toggleSettings() {
 }
 
 // Timer Logic
-const timeCheckbox = document.getElementById("toggle-reset-score");
+const timeCheckbox = document.getElementById("toggle-timer");
 const timeText = document.getElementById("time-txt");
 const timeMinEl = document.getElementById("time-min");
 const timeSecEl = document.getElementById("time-sec");
@@ -536,6 +545,36 @@ if (timeCheckbox) {
   timeText.style.display = "none";
 }
 
+// Sound logic
+const soundCheckbox = document.getElementById("toggle-sound"); // Variable globale pour suivre l'état du son
+let isSoundEnabled = document.getElementById("toggle-sound").checked;
+
+function setSoundActive(active) {
+  isSoundEnabled = active;
+}
+
+function playSound(soundName) {
+  if (isSoundEnabled && sounds[soundName]) {
+    // Reset du temps pour permettre des sons rapides successifs
+    sounds[soundName].currentTime = 0;
+    const playPromise = sounds[soundName].play();
+
+    // Gérer les cas où la lecture peut échouer
+    if (playPromise !== undefined) {
+      playPromise.catch((error) => {
+        console.warn(`Impossible de jouer le son "${soundName}":`, error);
+      });
+    }
+  }
+}
+
+// Optionnel : arrêter tous les sons si nécessaire
+function setSoundStop() {
+  Object.values(sounds).forEach((audio) => {
+    audio.pause();
+    audio.currentTime = 0;
+  });
+}
 function resetBestScore() {
   if (!confirm("Voulez-vous réinitialiser votre meilleur score ?")) return;
   localStorage.removeItem("bestScore");
@@ -732,6 +771,7 @@ function changeGoal() {
 
 function triggerWin() {
   if (document.getElementById("win-overlay")) return;
+  playSound("win");
   stopTimer();
 
   const currentTimeStr = `${timeMin} min, ${timeSec} sec`;
@@ -769,6 +809,11 @@ function triggerWin() {
   `;
   wrapper.appendChild(overlay);
 }
+
+// Event listener pour le toggle son
+soundCheckbox.addEventListener("change", (e) => {
+  setSoundActive(e.target.checked);
+});
 
 // Initialisation du jeu complet
 initBackground();
