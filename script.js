@@ -370,7 +370,7 @@ function checkGameOver() {
   const goalValue = document.getElementById("value-goal").textContent;
 
   // 1. Vérification de la Victoire (Seulement si pas encore atteint)
-  if (goalValue !== "∞" && !goalReached) {
+  if (goalValue !== "Infini" && !goalReached) {
     const target = parseInt(goalValue);
     if (grid.some((t) => t && t.value === target)) {
       goalReached = true;
@@ -750,6 +750,21 @@ if (timeCheckbox) {
   // Initialisation au chargement
   reduceHeaderTextSizeForTime(timeCheckbox.checked);
 }
+// mode normal : jeu de base
+// mode chrono : 60 sec pour faire le meilleur score possible
+// mode négatifs : des tuiles "négatives" apparaissent (ex: -2, -4) qui font perdre des points si fusionnées ou en gagner si inf à -8
+// mode gravité : les tuiles sont soumises à une gravité constante vers le bas, les mouvements horizontaux sont donc impossibles et chaque minute, la gravité change de direction (bas, gauche, haut, droite)
+// mode invisible : les tuiles sont invisibles et apparaissent au hasard sur la grille pendant 1 seconde toutes les 10 secondes sauf si aucun mouv n'a été fait entretemps
+// mode zen : bonus de séries, de fusions consécutives, de mouvements rapides, pas de game over : il enlève une ou plusieurs tuiles génantes à chaque fusion ou tous les 30 sec, le but est de faire le meilleur score possible sans stress
+// mode hard : combinaison de plusieurs modes (ex: chrono + négatifs + gravité) pour les joueurs expérimentés qui veulent un défi ultime 
+const MODES = ['Normal', 'Chrono', 'Négatifs', 'Gravité', 'Invisible', 'Zen', 'Hard'];
+let currentMode = MODES[0];
+function changeMode() {
+    let index = MODES.indexOf(currentMode);
+    currentMode = MODES[(index + 1) % MODES.length];
+    document.getElementById('value-mode').textContent = currentMode;
+    restartGame(); // Relance la logique avec les nouvelles règles
+}
 
 function changeGoal() {
   const goalValue = document.getElementById("value-goal");
@@ -757,8 +772,8 @@ function changeGoal() {
   let newGoal;
 
   if (currentGoal === "65536") {
-    newGoal = "∞"; // Si on est au max (65536), on passe à l'infini
-  } else if (currentGoal === "∞") {
+    newGoal = "Infini"; // Si on est au max (65536), on passe à l'infini
+  } else if (currentGoal === "Infini") {
     newGoal = 1024; // Si on est à l'infini, on revient à 1024
   } else {
     // Sinon, on multiplie par 2
