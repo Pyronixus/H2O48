@@ -1,7 +1,13 @@
+// jeu
 let GRID_SIZE = 6;
 const wrapper = document.getElementById("game");
 let grid = Array(GRID_SIZE * GRID_SIZE).fill(null);
+// objectif
 let goalReached = false;
+// mode chrono
+let chronoInterval = null;
+let totalPlayTime = 0;
+let last300Points = 0; // Pour suivre les paliers de 300 points
 
 const TILE_DATA = [
   { value: 2, bg: "#e0f7fa", shadow: "#a0d9e2", color: "#555" },
@@ -338,8 +344,16 @@ function injectTile(index, value) {
 
 function moveAndStartTimer(direction) {
   const timeCheckbox = document.getElementById("toggle-timer");
-  if (timeCheckbox && timeCheckbox.checked && timerInterval === null)
-    startTimer();
+  if (timeCheckbox && timeCheckbox.checked) {
+    if (timerInterval === null) {
+      startTimer();
+    }
+  } else if (currentMode === "Chrono") {
+    startChronoTime();
+  } else {
+    stopTimer();
+    stopChronoTime();
+  }
   move(direction);
 }
 
@@ -352,6 +366,23 @@ let maxScore = parseInt(localStorage.getItem("bestScore")) || 0;
 function updateScore(points) {
   currentScore += points;
   score.textContent = currentScore;
+
+  // Logique de bonus de temps (tous les 300 points) pour le mode chrono
+  if (currentMode === "Chrono") {
+    let currentThreshold = Math.floor(currentScore / 300);
+    if (currentThreshold > last300Points) {
+      let bonus = currentThreshold - last300Points;
+      let currentTime = parseInt(chronoTime.textContent);
+      chronoTime.textContent = currentTime + bonus; // Ajoute 1s par tranche de 300
+      last300Points = currentThreshold;
+      redTextChronoTime();
+
+      // effet visuel sur le chrono pour montrer le bonus
+      chronoTime.style.scale = "1.2";
+      setTimeout(() => (chronoTime.style.scale = "1.0"), 500);
+    }
+  }
+
   score.classList.remove("score-pop");
   void score.offsetWidth;
   score.classList.add("score-pop");
@@ -404,15 +435,18 @@ function checkGameOver() {
 }
 
 function triggerGameOver() {
+  // Empêche de superposer plusieurs overlays si la fonction est appelée deux fois
   if (document.getElementById("game-over-overlay")) return;
+
   playSound("gameOver");
   stopTimer();
+  stopChronoTime();
 
   const currentTimeStr = `${timeMin} min, ${timeSec} sec`;
   const totalSeconds = timeMin * 60 + timeSec;
   const goal = document.getElementById("value-goal").textContent;
 
-  // Logic localStorage (inchangée)
+  // Logique localStorage (inchangée)
   const recordKey = `bestTime_goal_${goal}`;
   let bestTime = localStorage.getItem(recordKey);
   let isNewRecord = false;
@@ -421,18 +455,36 @@ function triggerGameOver() {
     bestTime = totalSeconds;
     isNewRecord = true;
   }
+
+    // Calcul propre du temps tenu pour le mode Chrono
+  // totalPlayTime est le compteur de secondes accumulées
+  const heldMin = Math.floor(totalPlayTime / 60);
+  const heldSec = totalPlayTime % 60;
   const bestTimeDisplay = `${Math.floor(bestTime / 60)} min, ${bestTime % 60} sec`;
 
   const overlay = document.createElement("div");
   overlay.id = "game-over-overlay";
+
+  // Construction du contenu en respectant strictement votre style initial
   overlay.innerHTML = `
     <h2>Game Over</h2>
     <p>Score final : ${currentScore}</p>
-    <p style="font-size:15px; margin: -8px 0 20px; color: rgba(255,255,255,0.65);">${moveCount} mouvement${moveCount > 1 ? "s" : ""}</p>
+    <p style="font-size: 15px; margin: -8px 0 20px; color: rgba(255,255,255,0.65);">${moveCount} mouvement${moveCount > 1 ? "s" : ""}</p>
+    ${
+      currentMode === "Chrono"
+        ? `
+    <p id="total-time-display" style="font-size: 14px; margin: -8px 0 20px; color: rgba(255,255,255,0.65);">
+      Temps tenu : ${heldMin} min, ${heldSec} sec
+    </p>`
+        : ""
+    }
     <button id="restart-btn" onclick="animateAndRestart(this)">Rejouer</button>
   `;
+
   wrapper.appendChild(overlay);
 }
+const totalTime = document.getElementById("total-time");
+
 function continueGame() {
   const overlay = document.getElementById("win-overlay");
   if (overlay) overlay.remove();
@@ -440,6 +492,9 @@ function continueGame() {
   const timeCheckbox = document.getElementById("toggle-timer");
   if (timeCheckbox && timeCheckbox.checked) {
     startTimer();
+  }
+  if (currentMode === "Chrono") {
+    startChronoTime();
   }
 }
 
@@ -459,7 +514,6 @@ function restartGame() {
   wrapper.innerHTML = "";
 
   // 2. Réinitialisation de la logique (le tableau de données)
-  // On utilise la nouvelle valeur de GRID_SIZE
   grid = Array(GRID_SIZE * GRID_SIZE).fill(null);
 
   // 3. Réinitialisation des compteurs
@@ -480,7 +534,19 @@ function restartGame() {
     overlay.remove();
   }
 
-  // 6. Reconstruction du jeu
+  // 6. Reinitialisation du Chrono
+  stopChronoTime();
+  chronoTime.textContent = "60";
+  totalPlayTime = 0;
+  last300Points = 0;
+  if (chronoTime.classList.contains("chrono-warning")) {
+    chronoTime.classList.remove("chrono-warning");
+  }
+  if (currentMode === "Chrono") {
+    // Le chrono se lancera au premier mouvement via moveAndStartTimer
+  }
+
+  // 7. Reconstruction du jeu
   initBackground(); // Recrée les emplacements vides (le fond)
   spawnTile(); // Ajoute la première tuile
   spawnTile(); // Ajoute la deuxième tuile
@@ -756,16 +822,93 @@ if (timeCheckbox) {
 // mode gravité : les tuiles sont soumises à une gravité constante vers le bas, les mouvements horizontaux sont donc impossibles et chaque minute, la gravité change de direction (bas, gauche, haut, droite)
 // mode invisible : les tuiles sont invisibles et apparaissent au hasard sur la grille pendant 1 seconde toutes les 10 secondes sauf si aucun mouv n'a été fait entretemps
 // mode zen : bonus de séries, de fusions consécutives, de mouvements rapides, pas de game over : il enlève une ou plusieurs tuiles génantes à chaque fusion ou tous les 30 sec, le but est de faire le meilleur score possible sans stress
-// mode hard : combinaison de plusieurs modes (ex: chrono + négatifs + gravité) pour les joueurs expérimentés qui veulent un défi ultime 
-const MODES = ['Normal', 'Chrono', 'Négatifs', 'Gravité', 'Invisible', 'Zen', 'Hard'];
+// mode hard : combinaison de plusieurs modes (ex: chrono + négatifs + gravité) pour les joueurs expérimentés qui veulent un défi ultime
+const MODES = [
+  "Normal",
+  "Chrono",
+  "Négatifs",
+  "Gravité",
+  "Invisible",
+  "Zen",
+  "Hard",
+];
 let currentMode = MODES[0];
 function changeMode() {
-    let index = MODES.indexOf(currentMode);
-    currentMode = MODES[(index + 1) % MODES.length];
-    document.getElementById('value-mode').textContent = currentMode;
-    restartGame(); // Relance la logique avec les nouvelles règles
+  restartGame();
+  let index = MODES.indexOf(currentMode);
+  currentMode = MODES[(index + 1) % MODES.length];
+  document.getElementById("value-mode").textContent = currentMode;
+  toggleChronoTimeDisplay(); // Affiche ou masque le chrono selon le mode
+}
+const chronoTime = document.getElementById("time-chronoMode");
+const chronoTimeTotalSec = 0;
+const chronoTimeTotalMin = 0;
+
+function toggleChronoTimeDisplay() {
+  if (currentMode === "Chrono") {
+    chronoTime.style.display = "inline-block";
+  } else {
+    chronoTime.style.display = "none";
+  }
 }
 
+function startChronoTime() {
+  // On évite de lancer plusieurs intervalles en même temps
+  if (chronoInterval !== null) return;
+
+  chronoInterval = setInterval(() => {
+    let currentTime = parseInt(chronoTime.textContent);
+    totalPlayTime++;
+
+    if (
+      currentTime > 0 &&
+      !document.getElementById("game-over-overlay") &&
+      !document.getElementById("win-overlay")
+    ) {
+      currentTime--;
+      chronoTime.textContent = currentTime;
+      redTextChronoTime();
+      toggleTotaldisplay();
+    } else {
+      // Le temps est écoulé !
+      stopChronoTime();
+      triggerGameOver();
+    }
+  }, 1000);
+}
+function stopChronoTime() {
+  if (chronoInterval !== null) {
+    clearInterval(chronoInterval);
+    chronoInterval = null;
+  }
+}
+
+function redTextChronoTime() {
+  // 1. Convertir en nombre pour une comparaison fiable
+  const timeValue = parseInt(chronoTime.textContent);
+
+  if (timeValue <= 10) {
+    // 2. Pour que l'animation se relance à chaque seconde, on retire et remet la classe "chrono-warning"
+    chronoTime.classList.remove("chrono-warning");
+
+    // Force le "reflow" pour que le navigateur détecte le changement
+    void chronoTime.offsetWidth;
+
+    chronoTime.classList.add("chrono-warning");
+  } else {
+    chronoTime.classList.remove("chrono-warning");
+  }
+}
+
+function toggleTotaldisplay() {
+  setInterval(() => {
+    chronoTimeTotalSec++;
+    if (chronoTimeTotalSec >= 60) {
+      chronoTimeTotalSec = 0;
+      chronoTimeTotalMin++;
+    }
+  }, 1000);
+}
 function changeGoal() {
   const goalValue = document.getElementById("value-goal");
   let currentGoal = goalValue.textContent;

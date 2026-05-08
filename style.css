@@ -11,7 +11,7 @@ body {
   font-weight: 400;
   font-style: normal;
   color: white;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 #H-H2O48-ht {
@@ -1111,4 +1111,26 @@ body.dev-active .tile:hover {
   justify-content: center;
   z-index: 100;
   animation: fadeIn 0.4s forwards;
+}
+
+#time-chronoMode{
+  display: none;
+  font-size: 38px;
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.1);
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+@keyframes chrono-blink {
+  0% { color: white; transform: scale(1); }
+  50% { color: #ff4d4d; transform: scale(1.1); }
+  100% { color: white; transform: scale(1); }
+}
+
+.chrono-warning {
+  animation: chrono-blink 0.5s infinite;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
 }
