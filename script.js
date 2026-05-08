@@ -474,7 +474,7 @@ function triggerGameOver() {
       currentMode === "Chrono"
         ? `
     <p id="total-time-display" style="font-size: 14px; margin: -8px 0 20px; color: rgba(255,255,255,0.65);">
-      Temps tenu : ${heldMin} min, ${heldSec} sec
+      Temps tenu : ${heldMin} min, ${Math.floor(heldSec - 1)} sec
     </p>`
         : ""
     }
@@ -841,8 +841,8 @@ function changeMode() {
   toggleChronoTimeDisplay(); // Affiche ou masque le chrono selon le mode
 }
 const chronoTime = document.getElementById("time-chronoMode");
-const chronoTimeTotalSec = 0;
-const chronoTimeTotalMin = 0;
+let chronoTimeTotalSec = 0;
+let chronoTimeTotalMin = 0;
 
 function toggleChronoTimeDisplay() {
   if (currentMode === "Chrono") {
