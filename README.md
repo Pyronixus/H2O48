@@ -74,13 +74,6 @@ Pour lancer le "laboratoire" sur votre machine :
 ---
 
 ## 🎨 Design & Palette
+Le jeu utilise un dégradé élégant de bleu et de violet évoquant l'élément aquatique. La palette de couleurs des tuiles évolue dynamiquement, allant du bleu cyan léger pour les petites valeurs jusqu'au noir profond avec des accents néons pour la tuile finale.
 
-L'esthétique de **H2O48** utilise des dégradés de bleu et de violet évoquant l'élément aquatique. 
-* **Dynamisme** : Les couleurs des tuiles évoluent du bleu cyan léger au noir profond avec des accents néons à mesure que la valeur augmente.
-* **Responsive** : La grille est entièrement adaptative pour garantir une expérience fluide sur tous les types d'écrans.
-
----
-
-### 👨‍💻 À propos du développeur
-# ![pyronxius-avatar](https://avatars.githubusercontent.com/u/264767398?v=4&size=64) [**Pyronixus**](https://github.com/Pyronixus) 
-*Futur développeur Full-Stack passionné par le code et le design UI/UX*
+> **Note :** Ce projet est "Responsive". La grille s'adapte à la taille de votre écran pour une expérience fluide sur mobile comme sur ordinateur.
