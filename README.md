@@ -82,6 +82,6 @@ L'esthétique de **H2O48** utilise des dégradés de bleu et de violet évoquant
 ---
 
 ### 👨‍💻 À propos du développeur
-<img src="Assets/Img/logo.png" style="border-radius: 25%;" alt="pyronixus-avatar"> [**Pyronixus**](https://github.com/Pyronixus)
+![pyronxius-avatar](https://avatars.githubusercontent.com/u/264767398?v=4&size=64) [**Pyronixus**](https://github.com/Pyronixus)
 * *Futur développeur Full-Stack passionné par le code et le design UI/UX*
 
