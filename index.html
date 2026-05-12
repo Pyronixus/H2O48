@@ -22,7 +22,7 @@
       <div id="header-wrapper">
         <div id="header-main">
           <h1 id="hello-txt">
-            Bienvenue dans <span id="H-H2O48-ht">H</span>2<span
+            Bienvenue dans&nbsp;<span id="H-H2O48-ht">H</span>2<span
               id="O-H2048-ht"
               >O</span
             >48 !
@@ -83,37 +83,22 @@
               <span class="arrow-icon down">↑</span>
             </button>
           </div>
-            <div id="game"></div>
-          </div>
+          <div id="game"></div>
+        </div>
         <div id="settings-play">
           <div class="param-card toggle-control">
             <span class="toggle-control__label">Temps</span>
-            <div class="toggle-switch-wrapper">
-              <input
-                type="checkbox"
-                id="toggle-timer"
-                class="toggle-switch__input"
-              />
-              <label class="toggle-switch" for="toggle-timer">
-                <span class="toggle-switch__track"></span>
-                <span class="toggle-switch__thumb"></span>
-              </label>
-            </div>
+            <label class="switch">
+              <input type="checkbox" id="toggle-timer" />
+              <span class="slider"></span>
+            </label>
           </div>
           <div class="param-card toggle-control">
             <span class="toggle-control__label">Son</span>
-            <div class="toggle-switch-wrapper">
-              <input
-                type="checkbox"
-                id="toggle-sound"
-                class="toggle-switch__input"
-                checked
-              />
-              <label class="toggle-switch" for="toggle-sound">
-                <span class="toggle-switch__track"></span>
-                <span class="toggle-switch__thumb"></span>
-              </label>
-            </div>
+            <label class="switch">
+              <input type="checkbox" id="toggle-sound" checked />
+              <span class="slider"></span>
+            </label>
           </div>
           <button
             class="param-card btn-base action-btn"

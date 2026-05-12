@@ -293,71 +293,61 @@ main {
 .toggle-control {
   overflow: visible;
 }
-.toggle-switch-wrapper {
-  display: inline-flex;
-  align-items: center;
+
+/* The switch - the box around the slider */
+.switch {
+  font-size: 13px;
   position: relative;
-  min-width: 44px;
+  display: inline-block;
+  width: 3.5em;
+  height: 2em;
 }
-.toggle-switch {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 24px;
-  position: relative;
-  cursor: pointer;
-  user-select: none;
-  flex-shrink: 0;
-  transition:
-    transform 0.15s ease,
-    filter 0.15s ease;
-}
-.toggle-switch__input {
-  position: absolute;
+
+/* Hide default HTML checkbox */
+.switch input {
   opacity: 0;
   width: 0;
   height: 0;
 }
-.toggle-switch:active {
-  transform: translateY(3px);
-  filter: brightness(0.9);
-}
-.toggle-switch__track {
+
+/* The slider */
+.slider {
   position: absolute;
-  inset: 0;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.14);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition:
-    background 0.25s ease,
-    border-color 0.25s ease;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgb(141, 141, 141);
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.3);
+  transition: .4s;
+  border-radius: 10px;
 }
-.toggle-switch__thumb {
+
+.slider:before {
   position: absolute;
-  width: 18px;
-  height: 18px;
-  top: 3px;
-  left: 3px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15);
-  transition:
-    left 0.25s ease,
-    background 0.25s ease,
-    transform 0.25s ease;
+  content: "";
+  height: 1.4em;
+  width: 1.4em;
+  border-radius: 6px;
+  left: 0.3em;
+  bottom: 0.3em;
+  transform: rotate(270deg);
+  background-color: rgb(255, 255, 255);
+  transition: .4s;
 }
-.toggle-switch__input:checked + .toggle-switch .toggle-switch__track {
-  background: rgba(116, 192, 252, 0.95);
-  border-color: rgba(116, 192, 252, 0.7);
+
+.switch input:checked + .slider {
+  background-color: #2196F3;
+  box-shadow: 0 0 6px rgba(33, 150, 243, 0.6);
 }
-.toggle-switch__input:checked + .toggle-switch .toggle-switch__thumb {
-  left: calc(100% - 21px);
-  transform: scale(1.02);
+
+.switch input:focus + .slider {
+  outline: none;
 }
-.toggle-switch:hover .toggle-switch__track {
-  background-color: rgba(255, 255, 255, 0.3);
-  transition: background-color 0.6s ease;
+
+.switch input:checked + .slider:before {
+  transform: translateX(1.5em);
 }
 
 #settings-play button.btn-base {
