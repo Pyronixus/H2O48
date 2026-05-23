@@ -1,5 +1,5 @@
-# 🧪 H2O48 : The Fusion Lab <img alt="logo" src="Assets/Img/logo.png" height="100">
-
+# 🧪 H2O48 : The Fusion Lab
+<img alt="logo" src="Assets/Img/logo.png" height="100">
 [![Jouer en ligne](https://img.shields.io/badge/Demo-Jouer%20à%20H2O48-0078D4?style=for-the-badge&logo=google-chrome&logoColor=white)](https://pyronixus.github.io/H2O48)
 [![GitHub repo](https://img.shields.io/badge/Code-Dépôt%20GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Pyronixus/H2O48)
 [![License: MIT](https://img.shields.io/badge/License-MIT-f1c40f?style=for-the-badge)](https://opensource.org/licenses/MIT)
