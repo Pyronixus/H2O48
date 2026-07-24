@@ -1,6 +1,4 @@
-# 🧪 H2O48 : The Fusion Lab
-
-<img alt="logo" src="Assets/Img/logo.png" height="100">
+# <img alt="favicon" src="Assets/Img/favicon-transparent.png" height="80"> H2O48 : The Fusion Lab
 
 [![Jouer en ligne](https://img.shields.io/badge/Demo-Jouer%20à%20H2O48-0078D4?style=for-the-badge&logo=google-chrome&logoColor=white)](https://pyronixus.github.io/H2O48)
 [![GitHub repo](https://img.shields.io/badge/Code-Dépôt%20GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Pyronixus/H2O48)
@@ -10,6 +8,11 @@ Bienvenue dans **H2O48**, une réinterprétation moderne et fluide du célèbre 
 
 ---
 
+<img alt="preview-home" src="Assets/Img/preview.png">
+
+<img alt="preview-params" src="Assets/Img/params-preview.png">
+
+---
 ## ✨ Caractéristiques principales
 
 - **🧪 Grille Étendue** : Par défaut en **6x6**, modifiable et offrant un espace de jeu plus vaste pour des stratégies complexes et des scores monumentaux.
