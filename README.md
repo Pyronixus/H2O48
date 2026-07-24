@@ -97,3 +97,4 @@ L'esthétique de **H2O48** utilise des dégradés de bleu et de violet évoquant
 _Futur développeur Full-Stack passionné par le code et le design UI/UX_
 
 - [Portfolio - me contacter](https://pyrodevportfolio.vercel.app)
+- Vous pouvez aussi envoyer un mail à *pyrodevcontact@gmail.com*
