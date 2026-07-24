@@ -259,36 +259,93 @@ wrapper.addEventListener(
   { passive: true },
 );
 
-// Support WASD et Flèches
+// support et switch entre flèches + WASD, ZQSD, WASD/ZQSD/flèches uniquement
+
+const KEY_MAPPINGS = {
+  "flèches + WASD": {
+    up: ["ArrowUp", "w", "W"],
+    down: ["ArrowDown", "s", "S"],
+    left: ["ArrowLeft", "a", "A"],
+    right: ["ArrowRight", "d", "D"],
+  },
+  "flèches + ZQSD": {
+    up: ["ArrowUp", "z", "Z"],
+    down: ["ArrowDown", "s", "S"],
+    left: ["ArrowLeft", "q", "Q"],
+    right: ["ArrowRight", "d", "D"],
+  },
+  "flèches uniquement": {
+    up: ["ArrowUp"],
+    down: ["ArrowDown"],
+    left: ["ArrowLeft"],
+    right: ["ArrowRight"],
+  },
+  "WASD uniquement": {
+    up: ["w", "W"],
+    down: ["s", "S"],
+    left: ["a", "A"],
+    right: ["d", "D"],
+  },
+  "ZQSD uniquement": {
+    up: ["z", "Z"],
+    down: ["s", "S"],
+    left: ["q", "Q"],
+    right: ["d", "D"],
+  },
+  "Boutons uniquement": {
+    up: [],
+    down: [],
+    left: [],
+    right: [],
+  },
+};
+
 window.addEventListener("keydown", (e) => {
   if (e.target.tagName === "INPUT") return;
-  const validKeys = [
-    "ArrowUp",
-    "ArrowDown",
-    "ArrowLeft",
-    "ArrowRight",
-    "w",
-    "a",
-    "s",
-    "d",
-    "W",
-    "A",
-    "S",
-    "D",
-  ];
 
-  if (validKeys.includes(e.key)) {
-    if (e.key.startsWith("Arrow")) e.preventDefault();
+  // Empêche le défillement de la page si c'est une flèche
+  if (e.key.startsWith("Arrow")) e.preventDefault();
 
-    let dir = "";
-    if (e.key === "ArrowUp" || e.key.toLowerCase() === "w") dir = "up";
-    if (e.key === "ArrowDown" || e.key.toLowerCase() === "s") dir = "down";
-    if (e.key === "ArrowLeft" || e.key.toLowerCase() === "a") dir = "left";
-    if (e.key === "ArrowRight" || e.key.toLowerCase() === "d") dir = "right";
+  // On récupère le mapping correspondant au mode actuel (avec fallback sur 'flèches + WASD')
+  const currentMapping =
+    KEY_MAPPINGS[KvalueTxt] || KEY_MAPPINGS["flèches + WASD"];
 
-    moveAndStartTimer(dir);
+  // Recherche de la direction associée à la touche pressée
+  for (const [dir, keys] of Object.entries(currentMapping)) {
+    if (keys.includes(e.key)) {
+      moveAndStartTimer(dir);
+      break; // On arrête la recherche dès qu'on a trouvé la direction
+    }
   }
 });
+
+let KvalueTxt = document.getElementById("value-keyboard").textContent;
+
+function changeKeyboard() {
+  if (KvalueTxt === "flèches + WASD") {
+    KvalueTxt = "flèches + ZQSD";
+  } else if (KvalueTxt === "flèches + ZQSD") {
+    KvalueTxt = "flèches uniquement";
+  } else if (KvalueTxt === "flèches uniquement") {
+    KvalueTxt = "WASD uniquement";
+  } else if (KvalueTxt === "WASD uniquement") {
+    KvalueTxt = "ZQSD uniquement";
+  } else if (KvalueTxt === "ZQSD uniquement") {
+    KvalueTxt = "Boutons uniquement";
+  } else if (KvalueTxt === "Boutons uniquement") {
+    KvalueTxt = "flèches + WASD";
+  }
+
+  document.getElementById("value-keyboard").textContent = KvalueTxt;
+  localStorage.setItem("keyboardMode", KvalueTxt);
+}
+
+function loadKeyboardMode() {
+  KvalueTxt = localStorage.getItem("keyboardMode") || "flèches + WASD";
+  document.getElementById("value-keyboard").textContent = KvalueTxt;
+}
+
+loadKeyboardMode();
 
 let holdTimeout = null;
 let holdInterval = null;
@@ -456,7 +513,7 @@ function triggerGameOver() {
     isNewRecord = true;
   }
 
-    // Calcul propre du temps tenu pour le mode Chrono
+  // Calcul propre du temps tenu pour le mode Chrono
   // totalPlayTime est le compteur de secondes accumulées
   const heldMin = Math.floor(totalPlayTime / 60);
   const heldSec = totalPlayTime % 60;
@@ -852,8 +909,8 @@ function toggleChronoTimeDisplay() {
   }
 }
 
+// --- Chrono ---
 function startChronoTime() {
-  // On évite de lancer plusieurs intervalles en même temps
   if (chronoInterval !== null) return;
 
   chronoInterval = setInterval(() => {
@@ -868,14 +925,16 @@ function startChronoTime() {
       currentTime--;
       chronoTime.textContent = currentTime;
       redTextChronoTime();
+
+      // Appel propre : incrémente le total à chaque seconde
       toggleTotaldisplay();
     } else {
-      // Le temps est écoulé !
       stopChronoTime();
       triggerGameOver();
     }
   }, 1000);
 }
+
 function stopChronoTime() {
   if (chronoInterval !== null) {
     clearInterval(chronoInterval);
@@ -901,14 +960,15 @@ function redTextChronoTime() {
 }
 
 function toggleTotaldisplay() {
-  setInterval(() => {
-    chronoTimeTotalSec++;
-    if (chronoTimeTotalSec >= 60) {
-      chronoTimeTotalSec = 0;
-      chronoTimeTotalMin++;
-    }
-  }, 1000);
+  chronoTimeTotalSec++;
+  if (chronoTimeTotalSec >= 60) {
+    chronoTimeTotalSec = 0;
+    chronoTimeTotalMin++;
+  }
 }
+
+// --- Négatifs ---
+
 function changeGoal() {
   const goalValue = document.getElementById("value-goal");
   let currentGoal = goalValue.textContent;

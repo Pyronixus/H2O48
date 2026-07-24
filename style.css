@@ -17,7 +17,7 @@ body {
 #H-H2O48-ht {
   color: rgba(255, 255, 255, 0.8);
 }
-#O-H2048-ht {
+#O-H2O48-ht {
   color: rgb(116, 192, 252);
 }
 
@@ -319,7 +319,6 @@ main {
   right: 0;
   bottom: 0;
   background-color: rgb(141, 141, 141);
-  box-shadow: 0 0 6px rgba(255, 255, 255, 0.3);
   transition: .4s;
   border-radius: 10px;
 }
@@ -356,8 +355,8 @@ main {
 
 /* ── GAME BOARD ── */
 #game {
-  width: min(500px, 90vw);
-  height: min(500px, 90vw);
+  width: 55vh;
+  height: 55vh;
   margin: 0 0 48px 0;
   background-color: rgba(255, 255, 255, 0.15);
   border: 3px solid rgba(255, 255, 255, 0.3);
@@ -369,12 +368,13 @@ main {
     margin 0.4s ease,
     transform 0.4s ease;
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  grid-template-rows: repeat(6, 1fr);
+  grid-template-columns: repeat(var(--grid-size, 6), 1fr);
+  grid-template-rows: repeat(var(--grid-size, 6), 1fr);
   gap: 8px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   position: relative;
-  touch-action: none; /* Prevents scroll on mobile swipe */
+  touch-action: none;
+  box-sizing: border-box;
 }
 
 /* ── TILES (Pixel Perfect Positionning) ── */
@@ -1085,29 +1085,6 @@ body.dev-active .tile:hover {
   font-size: 10px;
   color: rgba(255, 255, 255, 0.45);
   font-family: sans-serif;
-}
-
-#game {
-  height: 55vh;
-  width: 55vh;
-  margin: 0 0 48px 0;
-  background-color: rgba(255, 255, 255, 0.15);
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  border-radius: 15px;
-  padding: 10px;
-  transition:
-    width 0.4s ease,
-    height 0.4s ease,
-    margin 0.4s ease,
-    transform 0.4s ease;
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  grid-template-rows: repeat(6, 1fr);
-  gap: 8px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  position: relative;
-  touch-action: none;
-  box-sizing: border-box;
 }
 
 /* Style spécifique à la victoire */
