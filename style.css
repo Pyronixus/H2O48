@@ -291,6 +291,49 @@ body {
   transform: rotate(0deg);
 }
 
+#btn-restart {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background-color: transparent;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  position: absolute;
+  right: 15vh;
+  /* Ajoutez ces lignes pour qu'il suive la transition de l'en-tête */
+  transition: right 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#icon-restart {
+  width: 40px;
+  height: 40px;
+  color: rgba(255, 255, 255, 0.8);
+  /* On définit une transition fluide par défaut pour le hover de la couleur */
+  transition: color 0.3s ease-in-out;
+}
+
+#icon-restart:hover {
+  color: white;
+}
+
+/* Animation jouée entièrement même en cas de clics rapprochés */
+#icon-restart.is-spinning {
+  animation: full-spin 1s ease-in-out;
+}
+
+@keyframes full-spin {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.2) rotate(360deg);
+  }
+  100% {
+    transform: scale(1) rotate(720deg);
+  }
+}
+
 /* ── SETTINGS ICON ── */
 #icon-settings {
   width: 40px;
@@ -765,6 +808,9 @@ header {
 /* ── SETTINGS-OPEN STATE ── */
 body.settings-open #header-wrapper {
   transform: translateX(-100%);
+}
+body.settings-open #btn-restart {
+  right: calc(15vh + 100%);
 }
 body.settings-open main {
   justify-content: flex-start;

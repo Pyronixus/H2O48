@@ -38,7 +38,11 @@
       </div>
       <div id="header-settings"></div>
     </div>
-    <button id="btn-settings" aria-label="Paramètres" onclick="toggleSettings()">
+    <button id="btn-restart" aria-label="Rejouer" onclick="triggerRestartAnimation()"><svg id="icon-restart"
+        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+        <path fill="currentColor"
+          d="M552 256L408 256C398.3 256 389.5 250.2 385.8 241.2C382.1 232.2 384.1 221.9 391 215L437.7 168.3C362.4 109.7 253.4 115 184.2 184.2C109.2 259.2 109.2 380.7 184.2 455.7C259.2 530.7 380.7 530.7 455.7 455.7C463.9 447.5 471.2 438.8 477.6 429.6C487.7 415.1 507.7 411.6 522.2 421.7C536.7 431.8 540.2 451.8 530.1 466.3C521.6 478.5 511.9 490.1 501 501C401 601 238.9 601 139 501C39.1 401 39 239 139 139C233.3 44.7 382.7 39.4 483.3 122.8L535 71C541.9 64.1 552.2 62.1 561.2 65.8C570.2 69.5 576 78.3 576 88L576 232C576 245.3 565.3 256 552 256z" />
+      </svg></button> <button id="btn-settings" aria-label="Paramètres" onclick="toggleSettings()">
       <svg id="icon-settings" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
         <path fill="currentColor"
           d="M444.788 291.1l42.616 24.599c4.867 2.809 7.126 8.618 5.459 13.985-11.07 35.642-29.97 67.842-54.689 94.586a12.016 12.016 0 0 1-14.832 2.254l-42.584-24.595a191.577 191.577 0 0 1-60.759 35.13v49.182a12.01 12.01 0 0 1-9.377 11.718c-34.956 7.85-72.499 8.256-109.219.007-5.49-1.233-9.403-6.096-9.403-11.723v-49.184a191.555 191.555 0 0 1-60.759-35.13l-42.584 24.595a12.016 12.016 0 0 1-14.832-2.254c-24.718-26.744-43.619-58.944-54.689-94.586-1.667-5.366.592-11.175 5.459-13.985L67.212 291.1a193.48 193.48 0 0 1 0-70.199l-42.616-24.599c-4.867-2.809-7.126-8.618-5.459-13.985 11.07-35.642 29.97-67.842 54.689-94.586a12.016 12.016 0 0 1 14.832-2.254l42.584 24.595a191.577 191.577 0 0 1 60.759-35.13V25.759a12.01 12.01 0 0 1 9.377-11.718c34.956-7.85 72.499-8.256 109.219-.007 5.49 1.233 9.403 6.096 9.403 11.723v49.184a191.555 191.555 0 0 1 60.759 35.13l42.584-24.595a12.016 12.016 0 0 1 14.832-2.254c24.718 26.744 43.619 58.944 54.689 94.586 1.667 5.366-.592 11.175-5.459 13.985L444.788 220.9a193.485 193.485 0 0 1 0 70.2zM336 256c0-44.112-35.888-80-80-80s-80 35.888-80 80 35.888 80 80 80 80-35.888 80-80z" />
@@ -79,10 +83,7 @@
             <input type="checkbox" id="toggle-sound" checked />
             <span class="slider"></span>
           </label>
-        </div>
-        <button class="param-card btn-base action-btn" onclick="restartGame()">
-          Rejouer
-        </button>
+        </div>  
         <button class="param-card btn-base action-btn resetBestScore" onclick="resetBestScore()">
           Réinitialiser Record
         </button>
@@ -119,97 +120,104 @@
   </footer>
   <script src="script.js"></script>
   <!-- MODALE COMMENT JOUER (GLASSMORPHISM) -->
-<div id="how-to-play-modal" class="modal-glass-overlay">
-  <div class="modal-glass-content">
-    <button class="modal-close-btn" onclick="closeHowToPlay()" aria-label="Fermer"><i class="fa-solid fa-circle-xmark"></i></button>
-    
-    <div class="modal-header">
-      <h2>Comment Jouer à H2O48 ?</h2>
-    </div>
-    
-    <div class="modal-body">
-      <!-- SECTION : RÈGLES -->
-      <section class="modal-section">
-        <h3>📖 Les Règles de Base</h3>
-        <p>Le but du jeu est simple : fusionner les tuiles contenant des nombres identiques pour atteindre la tuile <strong>2048</strong> (et au-delà !).</p>
-        <ul>
-          <li><strong>Déplacement :</strong> Utilise les flèches directionnelles, les touches ZQSD/WASD, ou glisse ton doigt sur mobile pour déplacer toutes les tuiles.</li>
-          <li><strong>Fusion :</strong> Quand deux tuiles portant le même nombre se percutent, elles fusionnent en une seule dont la valeur est doublée (ex: 2 + 2 = 4).</li>
-          <li><strong>Fin de partie :</strong> La partie se termine si la grille est pleine et qu'aucun mouvement n'est possible.</li>
-        </ul>
-        <div class="modal-image-placeholder">
-          <!-- IMAGE : Capture d'écran montrant deux tuiles "8" sur le point d'être fusionnées -->
-          [ Insérer ici ton image : illustration_fusion.png ]
-        </div>
-      </section>
+  <div id="how-to-play-modal" class="modal-glass-overlay">
+    <div class="modal-glass-content">
+      <button class="modal-close-btn" onclick="closeHowToPlay()" aria-label="Fermer"><i
+          class="fa-solid fa-circle-xmark"></i></button>
 
-      <!-- SECTION : PARAMÈTRES -->
-      <section class="modal-section">
-        <h3>⚙️ Les Paramètres</h3>
-        <p>Adapte le jeu à ton style de jeu grâce au panneau de contrôle :</p>
-        <ul>
-          <li><strong>Grille :</strong> Modifie la taille du plateau (de 4x4 jusqu'à 8x8).</li>
-          <li><strong>Objectif :</strong> Change le but à atteindre (2048, 4096, 8192... ou Infini).</li>
-          <li><strong>Contrôles :</strong> Alterne entre différents modes de saisie (Flèches, ZQSD, Boutons virtuels).</li>
-        </ul>
-        <div class="modal-image-placeholder">
-          <!-- IMAGE : Capture d'écran du panneau des paramètres (boutons "grille", "objectif", "mode") -->
-          [ Insérer ici ton image : illustration_parametres.png ]
-        </div>
-      </section>
+      <div class="modal-header">
+        <h2>Comment Jouer à H2O48 ?</h2>
+      </div>
 
-      <!-- SECTION : MODES DE JEU -->
-      <section class="modal-section">
-        <h3>🕹️ Les Modes de Jeu</h3>
-        <p>Découvre des variantes uniques pour pimenter tes parties :</p>
-        <div class="modes-grid">
-          <div class="mode-card">
-            <h4>Normal</h4>
-            <p>Le jeu de base classique et relaxant.</p>
+      <div class="modal-body">
+        <!-- SECTION : RÈGLES -->
+        <section class="modal-section">
+          <h3>📖 Les Règles de Base</h3>
+          <p>Le but du jeu est simple : fusionner les tuiles contenant des nombres identiques pour atteindre la tuile
+            <strong>2048</strong> (et au-delà !).
+          </p>
+          <ul>
+            <li><strong>Déplacement :</strong> Utilise les flèches directionnelles, les touches ZQSD/WASD, ou glisse ton
+              doigt sur mobile pour déplacer toutes les tuiles.</li>
+            <li><strong>Fusion :</strong> Quand deux tuiles portant le même nombre se percutent, elles fusionnent en une
+              seule dont la valeur est doublée (ex: 2 + 2 = 4).</li>
+            <li><strong>Fin de partie :</strong> La partie se termine si la grille est pleine et qu'aucun mouvement
+              n'est possible.</li>
+          </ul>
+          <div class="modal-image-placeholder">
+            <!-- IMAGE : Capture d'écran montrant deux tuiles "8" sur le point d'être fusionnées -->
+            [ Insérer ici ton image : illustration_fusion.png ]
           </div>
-          <div class="mode-card">
-            <h4>Chrono</h4>
-            <p>60 secondes pour faire le meilleur score possible. Fusionner rapporte du temps bonus !</p>
+        </section>
+
+        <!-- SECTION : PARAMÈTRES -->
+        <section class="modal-section">
+          <h3>⚙️ Les Paramètres</h3>
+          <p>Adapte le jeu à ton style de jeu grâce au panneau de contrôle :</p>
+          <ul>
+            <li><strong>Grille :</strong> Modifie la taille du plateau (de 4x4 jusqu'à 8x8).</li>
+            <li><strong>Objectif :</strong> Change le but à atteindre (2048, 4096, 8192... ou Infini).</li>
+            <li><strong>Contrôles :</strong> Alterne entre différents modes de saisie (Flèches, ZQSD, Boutons virtuels).
+            </li>
+          </ul>
+          <div class="modal-image-placeholder">
+            <!-- IMAGE : Capture d'écran du panneau des paramètres (boutons "grille", "objectif", "mode") -->
+            [ Insérer ici ton image : illustration_parametres.png ]
           </div>
-          <div class="mode-card">
-            <h4>Négatifs</h4>
-            <p>Des tuiles négatives apparaissent. Fusionne-les pour les éliminer ou perds des points !</p>
+        </section>
+
+        <!-- SECTION : MODES DE JEU -->
+        <section class="modal-section">
+          <h3>🕹️ Les Modes de Jeu</h3>
+          <p>Découvre des variantes uniques pour pimenter tes parties :</p>
+          <div class="modes-grid">
+            <div class="mode-card">
+              <h4>Normal</h4>
+              <p>Le jeu de base classique et relaxant.</p>
+            </div>
+            <div class="mode-card">
+              <h4>Chrono</h4>
+              <p>60 secondes pour faire le meilleur score possible. Fusionner rapporte du temps bonus !</p>
+            </div>
+            <div class="mode-card">
+              <h4>Négatifs</h4>
+              <p>Des tuiles négatives apparaissent. Fusionne-les pour les éliminer ou perds des points !</p>
+            </div>
+            <div class="mode-card">
+              <h4>Gravité</h4>
+              <p>Les tuiles "tombent" constamment dans une direction qui change chaque minute.</p>
+            </div>
+            <div class="mode-card">
+              <h4>Invisible</h4>
+              <p>Les tuiles sont invisibles et n'apparaissent qu'une fraction de seconde !</p>
+            </div>
+            <div class="mode-card">
+              <h4>Zen</h4>
+              <p>Pas de stress, pas de game over. Le jeu nettoie les tuiles gênantes pour toi.</p>
+            </div>
+            <div class="mode-card">
+              <h4>Hard</h4>
+              <p>Le défi ultime combinant plusieurs modes extrêmes (Chrono + Négatifs + Gravité).</p>
+            </div>
           </div>
-          <div class="mode-card">
-            <h4>Gravité</h4>
-            <p>Les tuiles "tombent" constamment dans une direction qui change chaque minute.</p>
+          <div class="modal-image-placeholder">
+            <!-- IMAGE : Capture d'écran montrant un mode spécial, par exemple le compteur visuel rouge du mode Chrono -->
+            [ Insérer ici ton image : illustration_modes.png ]
           </div>
-          <div class="mode-card">
-            <h4>Invisible</h4>
-            <p>Les tuiles sont invisibles et n'apparaissent qu'une fraction de seconde !</p>
-          </div>
-          <div class="mode-card">
-            <h4>Zen</h4>
-            <p>Pas de stress, pas de game over. Le jeu nettoie les tuiles gênantes pour toi.</p>
-          </div>
-          <div class="mode-card">
-            <h4>Hard</h4>
-            <p>Le défi ultime combinant plusieurs modes extrêmes (Chrono + Négatifs + Gravité).</p>
-          </div>
-        </div>
-        <div class="modal-image-placeholder">
-          <!-- IMAGE : Capture d'écran montrant un mode spécial, par exemple le compteur visuel rouge du mode Chrono -->
-          [ Insérer ici ton image : illustration_modes.png ]
-        </div>
-      </section>
-    </div>
-    
-    <div class="modal-footer">
-      <label class="glass-checkbox-label">
-        <input type="checkbox" id="disable-startup-modal" />
-        <span class="glass-checkbox-custom">
-          <i class="fa-solid fa-check"></i>
-        </span>
-        Ne plus afficher au démarrage
-      </label>
+        </section>
+      </div>
+
+      <div class="modal-footer">
+        <label class="glass-checkbox-label">
+          <input type="checkbox" id="disable-startup-modal" />
+          <span class="glass-checkbox-custom">
+            <i class="fa-solid fa-check"></i>
+          </span>
+          Ne plus afficher au démarrage
+        </label>
+      </div>
     </div>
   </div>
-</div>
 </body>
 
 </html>

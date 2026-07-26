@@ -506,6 +506,9 @@ function moveAndStartTimer(direction) {
   if (timeCheckbox && timeCheckbox.checked) {
     if (timerInterval === null) {
       startTimer();
+      if (currentScore > 0 && moveCount > 0) {
+      restartGame();
+      }
     }
   } else if (currentMode === "Chrono") {
     startChronoTime();
@@ -1211,6 +1214,28 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 400);
   }
 });
+
+function triggerRestartAnimation() {
+  const iconRestart = document.getElementById("icon-restart");
+  if (!iconRestart) return;
+
+  // Retire la classe pour stopper l'état précédent si elle y est encore
+  iconRestart.classList.remove("is-spinning");
+  
+  // Force un reflow du navigateur (astuce pour réinitialiser l'animation CSS)
+  void iconRestart.offsetWidth;
+  
+  // Ajoute la classe qui déclenche l'animation de rotation complète
+  iconRestart.classList.add("is-spinning");
+
+  // Lance la logique de redémarrage du jeu
+
+  // Retire la classe une fois l'animation terminée (ex: après 1 seconde)
+  setTimeout(() => {
+    iconRestart.classList.remove("is-spinning");
+    restartGame();
+  }, 1000);
+}
 
 // Initialisation du jeu complet
 initBackground();
