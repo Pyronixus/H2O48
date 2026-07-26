@@ -118,6 +118,98 @@
     </div>
   </footer>
   <script src="script.js"></script>
+  <!-- MODALE COMMENT JOUER (GLASSMORPHISM) -->
+<div id="how-to-play-modal" class="modal-glass-overlay">
+  <div class="modal-glass-content">
+    <button class="modal-close-btn" onclick="closeHowToPlay()" aria-label="Fermer"><i class="fa-solid fa-circle-xmark"></i></button>
+    
+    <div class="modal-header">
+      <h2>Comment Jouer à H2O48 ?</h2>
+    </div>
+    
+    <div class="modal-body">
+      <!-- SECTION : RÈGLES -->
+      <section class="modal-section">
+        <h3>📖 Les Règles de Base</h3>
+        <p>Le but du jeu est simple : fusionner les tuiles contenant des nombres identiques pour atteindre la tuile <strong>2048</strong> (et au-delà !).</p>
+        <ul>
+          <li><strong>Déplacement :</strong> Utilise les flèches directionnelles, les touches ZQSD/WASD, ou glisse ton doigt sur mobile pour déplacer toutes les tuiles.</li>
+          <li><strong>Fusion :</strong> Quand deux tuiles portant le même nombre se percutent, elles fusionnent en une seule dont la valeur est doublée (ex: 2 + 2 = 4).</li>
+          <li><strong>Fin de partie :</strong> La partie se termine si la grille est pleine et qu'aucun mouvement n'est possible.</li>
+        </ul>
+        <div class="modal-image-placeholder">
+          <!-- IMAGE : Capture d'écran montrant deux tuiles "8" sur le point d'être fusionnées -->
+          [ Insérer ici ton image : illustration_fusion.png ]
+        </div>
+      </section>
+
+      <!-- SECTION : PARAMÈTRES -->
+      <section class="modal-section">
+        <h3>⚙️ Les Paramètres</h3>
+        <p>Adapte le jeu à ton style de jeu grâce au panneau de contrôle :</p>
+        <ul>
+          <li><strong>Grille :</strong> Modifie la taille du plateau (de 4x4 jusqu'à 8x8).</li>
+          <li><strong>Objectif :</strong> Change le but à atteindre (2048, 4096, 8192... ou Infini).</li>
+          <li><strong>Contrôles :</strong> Alterne entre différents modes de saisie (Flèches, ZQSD, Boutons virtuels).</li>
+        </ul>
+        <div class="modal-image-placeholder">
+          <!-- IMAGE : Capture d'écran du panneau des paramètres (boutons "grille", "objectif", "mode") -->
+          [ Insérer ici ton image : illustration_parametres.png ]
+        </div>
+      </section>
+
+      <!-- SECTION : MODES DE JEU -->
+      <section class="modal-section">
+        <h3>🕹️ Les Modes de Jeu</h3>
+        <p>Découvre des variantes uniques pour pimenter tes parties :</p>
+        <div class="modes-grid">
+          <div class="mode-card">
+            <h4>Normal</h4>
+            <p>Le jeu de base classique et relaxant.</p>
+          </div>
+          <div class="mode-card">
+            <h4>Chrono</h4>
+            <p>60 secondes pour faire le meilleur score possible. Fusionner rapporte du temps bonus !</p>
+          </div>
+          <div class="mode-card">
+            <h4>Négatifs</h4>
+            <p>Des tuiles négatives apparaissent. Fusionne-les pour les éliminer ou perds des points !</p>
+          </div>
+          <div class="mode-card">
+            <h4>Gravité</h4>
+            <p>Les tuiles "tombent" constamment dans une direction qui change chaque minute.</p>
+          </div>
+          <div class="mode-card">
+            <h4>Invisible</h4>
+            <p>Les tuiles sont invisibles et n'apparaissent qu'une fraction de seconde !</p>
+          </div>
+          <div class="mode-card">
+            <h4>Zen</h4>
+            <p>Pas de stress, pas de game over. Le jeu nettoie les tuiles gênantes pour toi.</p>
+          </div>
+          <div class="mode-card">
+            <h4>Hard</h4>
+            <p>Le défi ultime combinant plusieurs modes extrêmes (Chrono + Négatifs + Gravité).</p>
+          </div>
+        </div>
+        <div class="modal-image-placeholder">
+          <!-- IMAGE : Capture d'écran montrant un mode spécial, par exemple le compteur visuel rouge du mode Chrono -->
+          [ Insérer ici ton image : illustration_modes.png ]
+        </div>
+      </section>
+    </div>
+    
+    <div class="modal-footer">
+      <label class="glass-checkbox-label">
+        <input type="checkbox" id="disable-startup-modal" />
+        <span class="glass-checkbox-custom">
+          <i class="fa-solid fa-check"></i>
+        </span>
+        Ne plus afficher au démarrage
+      </label>
+    </div>
+  </div>
+</div>
 </body>
 
 </html>

@@ -892,7 +892,7 @@ function showVisuelPanel() {
   header.innerHTML = `<span>🎨 Toutes les tuiles</span>`;
   const closeBtn = document.createElement("button");
   closeBtn.id = "visuel-close";
-  closeBtn.textContent = "✕";
+  closeBtn.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>';
   closeBtn.addEventListener("click", toggleVisuelMode);
   header.appendChild(closeBtn);
   visuelPanel.appendChild(header);
@@ -1167,6 +1167,49 @@ function triggerWin() {
 // Event listener pour le toggle son
 soundCheckbox.addEventListener("change", (e) => {
   setSoundActive(e.target.checked);
+});
+
+/* ========================================= */
+/* LOGIQUE MODALE "COMMENT JOUER"            */
+/* ========================================= */
+
+// La fonction showHowToPlay() est déjà liée au bouton dans index.html
+function showHowToPlay() {
+  const modal = document.getElementById("how-to-play-modal");
+  if (modal) {
+    modal.classList.add("visible");
+  }
+}
+
+function closeHowToPlay() {
+  const modal = document.getElementById("how-to-play-modal");
+  if (modal) {
+    modal.classList.remove("visible");
+    
+    // Sauvegarde l'état de la checkbox dans le localStorage à la fermeture
+    const disableCheckbox = document.getElementById("disable-startup-modal");
+    if (disableCheckbox) {
+      localStorage.setItem("hideHowToPlayStartup", disableCheckbox.checked);
+    }
+  }
+}
+
+// Vérification au lancement du jeu
+document.addEventListener("DOMContentLoaded", () => {
+  const hideAtStartup = localStorage.getItem("hideHowToPlayStartup") === "true";
+  const disableCheckbox = document.getElementById("disable-startup-modal");
+  
+  if (disableCheckbox) {
+    // Restaure l'état visuel de la checkbox selon le localStorage
+    disableCheckbox.checked = hideAtStartup;
+  }
+  
+  if (!hideAtStartup) {
+    // Léger délai pour que l'animation d'entrée soit fluide après le chargement
+    setTimeout(() => {
+      showHowToPlay();
+    }, 400);
+  }
 });
 
 // Initialisation du jeu complet

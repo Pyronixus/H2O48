@@ -1368,3 +1368,250 @@ body.dev-active .tile:hover {
   transform: none !important;
   filter: grayscale(0.8) !important;
 }
+
+/* ========================================= */
+/* MODALE COMMENT JOUER - GLASSMORPHISM      */
+/* ========================================= */
+
+.modal-glass-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 15px; /* Évite que la modale colle aux bords de l'écran sur mobile */
+  box-sizing: border-box;
+}
+
+.modal-glass-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Le conteneur effet verre (Largeur adaptative et anti-scroll horizontal) */
+.modal-glass-content {
+  position: relative;
+  width: 100%;
+  max-width: 600px; /* Largeur maximale sur PC */
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-top: 1px solid rgba(255, 255, 255, 0.45);
+  border-left: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 24px;
+  
+  box-shadow: 
+    0 30px 60px rgba(0, 0, 0, 0.4),
+    inset 0 1px 1px rgba(255, 255, 255, 0.4);
+    
+  color: white;
+  transform: translateY(30px) scale(0.95);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  
+  /* INDISPENSABLE pour empêcher le dépassement horizontal */
+  box-sizing: border-box;
+  overflow-x: hidden; 
+  overflow-y: hidden; /* Géré par .modal-body */
+}
+
+.modal-glass-overlay.visible .modal-glass-content {
+  transform: translateY(0) scale(1);
+}
+
+/* Bouton de fermeture */
+.modal-close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.2s ease;
+}
+
+.modal-close-btn:hover {
+  background: rgba(255, 82, 82, 0.6);
+  transform: scale(1.1) rotate(90deg);
+}
+
+/* En-tête */
+.modal-header {
+  padding: 25px 25px 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  box-sizing: border-box;
+}
+
+.modal-header h2 {
+  font-family: "Bungee", sans-serif;
+  font-size: 22px;
+  margin: 0;
+  color: #74c0fc;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Corps (Scrollable uniquement verticalement) */
+.modal-body {
+  padding: 20px 25px;
+  overflow-y: auto;
+  overflow-x: hidden; /* Bloque tout défilement vers la gauche ou la droite */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.6;
+  box-sizing: border-box;
+}
+
+/* Style de la scrollbar interne */
+.modal-body::-webkit-scrollbar {
+  width: 6px;
+}
+.modal-body::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+.modal-body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.modal-section {
+  margin-bottom: 25px;
+  box-sizing: border-box;
+}
+
+.modal-section h3 {
+  font-family: "Bungee", sans-serif;
+  font-size: 16px;
+  color: white;
+  margin-bottom: 12px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.modal-section p, .modal-section li {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 8px;
+  word-break: break-word; /* Empêche les longs mots de casser la mise en page */
+}
+
+/* Grille pour les modes de jeu (Adaptative sans dépassement) */
+.modes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin: 15px 0;
+  box-sizing: border-box;
+}
+
+.mode-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 12px;
+  border-radius: 12px;
+  box-sizing: border-box;
+}
+
+.mode-card h4 {
+  margin: 0 0 6px;
+  color: #74c0fc;
+  font-size: 15px;
+}
+
+.mode-card p {
+  font-size: 12px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Placeholders pour les images */
+.modal-image-placeholder {
+  width: 100%;
+  min-height: 100px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px dashed rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 12px;
+  margin-top: 12px;
+  padding: 15px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* Pied de page */
+.modal-footer {
+  padding: 15px 25px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: flex-end;
+  background: rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+}
+
+.glass-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: -apple-system, sans-serif;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  user-select: none;
+}
+
+.glass-checkbox-label input {
+  display: none;
+}
+
+.glass-checkbox-custom {
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.glass-checkbox-custom i {
+  color: white;
+  font-size: 11px;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-checkbox-label input:checked + .glass-checkbox-custom {
+  background: #0288d1;
+  border-color: #4fc3f7;
+  box-shadow: 0 0 10px rgba(79, 195, 247, 0.5);
+}
+
+.glass-checkbox-label input:checked + .glass-checkbox-custom i {
+  opacity: 1;
+  transform: scale(1);
+}
