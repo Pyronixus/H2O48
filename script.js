@@ -165,17 +165,95 @@ function slide(line, indices) {
 let movingTimeout = null;
 let moveCount = 0;
 
+let toastTimeout = null;
+let toastCooldownTimeout = null;
+let isToastCoolingDown = false; // Bloque le re-déclenchement du toast pendant 1 seconde après disparition
+
+function showLiquidGlassToast(message) {
+  // Si le toast est en période de rechargement (1s), on ignore la demande
+  if (isToastCoolingDown) return;
+
+  let toast = document.getElementById("liquid-glass-toast");
+
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "liquid-glass-toast";
+    toast.className = "liquid-glass-toast";
+    document.body.appendChild(toast);
+  }
+
+  toast.innerHTML = `<i class="fa-solid fa-ban" style="color: #ff5252;"></i> <span>${message}</span>`;
+
+  // Réinitialise l'animation si la notif est déjà affichée
+  toast.classList.remove("show", "shake");
+  void toast.offsetWidth; // Force reflow
+  toast.classList.add("show", "shake");
+
+  clearTimeout(toastTimeout);
+  clearTimeout(toastCooldownTimeout);
+
+  // Masque la notif au bout de 1.8s
+  toastTimeout = setTimeout(() => {
+    toast.classList.remove("show", "shake");
+    isToastCoolingDown = true; // Début de la pause de 1 seconde
+
+    // Attend 1s complète après le retrait visuel avant d'autoriser à réafficher
+    toastCooldownTimeout = setTimeout(() => {
+      isToastCoolingDown = false;
+    }, 1000);
+  }, 1800);
+}
+
+// Stocke les directions actuellement bloquées/grisées
+const blockedDirections = new Set();
+
+function highlightBlockedArrow(direction) {
+  const arrowBtn = document.querySelector(`.btn-arrow.arrow-${direction}`);
+  if (!arrowBtn) return;
+
+  // 1. On retire immédiatement la classe grisée pour jouer l'animation rouge
+  arrowBtn.classList.remove("arrow-disabled", "arrow-blocked");
+  void arrowBtn.offsetWidth; // Force reflow pour relancer l'animation CSS
+  arrowBtn.classList.add("arrow-blocked");
+
+  // 2. À la fin de l'animation rouge (450ms), on repasse le bouton en grisé
+  setTimeout(() => {
+    arrowBtn.classList.remove("arrow-blocked");
+    arrowBtn.classList.add("arrow-disabled");
+    blockedDirections.add(direction);
+  }, 450);
+}
+
+// Fonction pour réinitialiser et débloquer les flèches après un mouvement réussi
+function resetBlockedArrows() {
+  blockedDirections.forEach((dir) => {
+    const arrowBtn = document.querySelector(`.btn-arrow.arrow-${dir}`);
+    if (arrowBtn) {
+      arrowBtn.classList.remove("arrow-disabled", "arrow-blocked");
+    }
+  });
+  blockedDirections.clear();
+}
+
+let isMoving = false; // Verrou pour éviter les spams de touches
+
 function move(direction) {
-  // Si un overlay de victoire ou de défaite est présent, on bloque les mouvements
+  // 1. Si un mouvement est déjà en cours d'animation ou qu'un overlay est présent, on ignore
   if (
+    isMoving ||
     document.getElementById("win-overlay") ||
     document.getElementById("game-over-overlay")
   ) {
     return;
   }
 
+  // Active le verrou
+  isMoving = true;
+
+  // Sauvegarde de l'état actuel de la grille
   let oldGrid = JSON.stringify(grid.map((t) => (t ? t.value : null)));
 
+  // Simulation du mouvement sur les lignes/colonnes
   for (let i = 0; i < GRID_SIZE; i++) {
     let line = [];
     let indices = [];
@@ -197,7 +275,7 @@ function move(direction) {
 
     if (direction === "right" || direction === "down") {
       result.reverse();
-      indices.reverse(); // Restaurer l'ordre
+      indices.reverse();
     }
 
     indices.forEach((globalIdx, k) => {
@@ -205,26 +283,50 @@ function move(direction) {
     });
   }
 
-  // Si le tableau a changé
-  if (oldGrid !== JSON.stringify(grid.map((t) => (t ? t.value : null)))) {
+  // Vérification si la grille a réellement bougé
+  const hasMoved = oldGrid !== JSON.stringify(grid.map((t) => (t ? t.value : null)));
+
+  if (hasMoved) {
+    // MOUVEMENT VALIDE
     moveCount++;
     playSound("move");
     updateView();
+
+    // Débloque les flèches qui étaient grisées
+    resetBlockedArrows(); 
+
     grid.forEach((tile) => {
       if (tile?.element) tile.element.classList.add("tile-moving");
     });
 
-    clearTimeout(movingTimeout); // Fix Spam bug
+    clearTimeout(movingTimeout);
     movingTimeout = setTimeout(() => {
       grid.forEach((tile) => {
         if (tile?.element) tile.element.classList.remove("tile-moving");
       });
     }, 260);
 
+    // Une fois la tuile générée et les vérifications faites, on libère le verrou
     setTimeout(() => {
       spawnTile();
       checkGameOver();
+      isMoving = false; // <-- Libération du verrou après l'apparition de la tuile
     }, 150);
+
+  } else {
+    // MOUVEMENT IMPOSSIBLE
+    const directionNames = {
+      up: "haut",
+      down: "bas",
+      left: "gauche",
+      right: "droite"
+    };
+
+    highlightBlockedArrow(direction);
+    showLiquidGlassToast(`Mouvement vers le ${directionNames[direction] || direction} impossible !`);
+
+    // Libération immédiate du verrou pour ne pas bloquer les commandes
+    isMoving = false;
   }
 }
 
@@ -499,6 +601,22 @@ function triggerGameOver() {
   stopTimer();
   stopChronoTime();
 
+  // 1. Clignotement rouge sur toutes les flèches
+  const allArrows = document.querySelectorAll(".btn-arrow");
+  allArrows.forEach((btn) => {
+    btn.classList.remove("arrow-blocked", "arrow-disabled");
+    void btn.offsetWidth; // Force reflow pour relancer l'animation
+    btn.classList.add("arrow-gameover-blink");
+  });
+
+  // 2. Après le double clignotement (0.8s), passer toutes les flèches en grisé
+  setTimeout(() => {
+    allArrows.forEach((btn) => {
+      btn.classList.remove("arrow-gameover-blink");
+      btn.classList.add("arrow-disabled");
+    });
+  }, 800);
+
   const currentTimeStr = `${timeMin} min, ${timeSec} sec`;
   const totalSeconds = timeMin * 60 + timeSec;
   const goal = document.getElementById("value-goal").textContent;
@@ -577,6 +695,7 @@ function restartGame() {
   currentScore = 0;
   moveCount = 0;
   goalReached = false;
+  isMoving = false; // Verrou pour éviter les spams de touches
   score.textContent = currentScore; // Mise à jour de l'affichage du score
 
   // 4. Réinitialisation du Timer
@@ -591,7 +710,7 @@ function restartGame() {
     overlay.remove();
   }
 
-  // 6. Reinitialisation du Chrono
+  // 6. Réinitialisation du Chrono
   stopChronoTime();
   chronoTime.textContent = "60";
   totalPlayTime = 0;
@@ -603,7 +722,16 @@ function restartGame() {
     // Le chrono se lancera au premier mouvement via moveAndStartTimer
   }
 
-  // 7. Reconstruction du jeu
+  // 7. Réinitialisation de l'état visuel de toutes les flèches
+  const allArrows = document.querySelectorAll(".btn-arrow");
+  allArrows.forEach((btn) => {
+    btn.classList.remove("arrow-disabled", "arrow-blocked", "arrow-gameover-blink");
+  });
+  
+  // Vider le Set des directions bloquées
+  blockedDirections.clear();
+
+  // 8. Reconstruction du jeu
   initBackground(); // Recrée les emplacements vides (le fond)
   spawnTile(); // Ajoute la première tuile
   spawnTile(); // Ajoute la deuxième tuile
@@ -984,7 +1112,15 @@ function changeGoal() {
   }
 
   goalValue.textContent = newGoal;
+  localStorage.setItem("goalValue", newGoal); // Sauvegarde dans le localStorage
   restartGame();
+}
+
+function loadGoalValue() {
+  const savedGoal = localStorage.getItem("goalValue");
+  if (savedGoal) {
+    document.getElementById("value-goal").textContent = savedGoal;
+  }
 }
 
 function triggerWin() {
@@ -1037,3 +1173,4 @@ soundCheckbox.addEventListener("change", (e) => {
 initBackground();
 spawnTile();
 spawnTile();
+loadGoalValue();

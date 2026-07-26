@@ -21,6 +21,87 @@ body {
   color: rgb(116, 192, 252);
 }
 
+/* Styling du bouton "Comment Jouer" (Glassmorphism / H2O48) */
+.btn-how-to-play {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  color: rgba(255, 255, 255, 0.9);
+
+  /* Glassmorphism */
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  /* Contour effet verre */
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 14px;
+
+  box-shadow: 
+    0 4px 20px 0 rgba(0, 0, 0, 0.15),
+    inset 0 0 10px 0 rgba(255, 255, 255, 0.05);
+
+  cursor: pointer;
+  outline: none;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-how-to-play span {
+  font-family: "Bungee", sans-serif;
+  position: relative;
+  z-index: 2;
+  text-shadow: 0 0.5px 3px rgba(0, 0, 0, 0.3);
+}
+
+.btn-how-to-play::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle at center,
+    rgba(72, 202, 228, 0.2) 0%,
+    transparent 60%
+  );
+  opacity: 0;
+  transform: scale(0.5);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  z-index: 1;
+}
+
+.btn-how-to-play:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.28);
+  border-top-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 25px 0 rgba(0, 180, 216, 0.2),
+    inset 0 0 14px 0 rgba(72, 202, 228, 0.25);
+}
+
+.btn-how-to-play:hover::before {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.btn-how-to-play:active {
+  transform: translateY(1px) scale(0.97);
+  box-shadow: 
+    0 2px 10px 0 rgba(0, 0, 0, 0.15),
+    inset 0 0 6px 0 rgba(255, 255, 255, 0.1);
+}
+
 /* ── ARROWS ── */
 #info-arrows {
   display: grid;
@@ -112,7 +193,7 @@ body {
     /* L'ombre portée au sol */ inset 0 1px 2px rgba(255, 255, 255, 0.5); /* Éclat sur le rebord intérieur */
 
   transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 0.5px 3px rgba(0, 0, 0, 0.3);
 
   /* Nettoyage des bords */
   background-clip: padding-box;
@@ -1166,4 +1247,124 @@ body.dev-active .tile:hover {
   animation: chrono-blink 0.5s infinite;
   font-weight: bold;
   text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+}
+
+/* ── NOTIFICATION LIQUID GLASS (ENTRÉE/SORTIE PROFONDEUR) ── */
+.liquid-glass-toast {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  z-index: 1000;
+  
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  border-radius: 20px;
+  
+  font-family: "Bungee", sans-serif;
+  font-size: 14px;
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+
+  /* Glassmorphism effet liquide */
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  
+  /* Contour cristal effet verre */
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-top: 1px solid rgba(255, 255, 255, 0.6);
+  
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.25),
+    inset 0 1px 2px rgba(255, 255, 255, 0.6),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.2);
+
+  pointer-events: none;
+
+  /* ÉTAT INITIAL / SORTIE : Reculée au fond (scale 0.75) + invisible */
+  opacity: 0;
+  transform: translate(-50%, 0) scale(0.75);
+  
+  /* Transition continue et ultra-smooth sans changement de courbe */
+  transition: 
+    opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Reflet spéculaire supérieur */
+.liquid-glass-toast::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 40%;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.35) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  border-radius: 20px 20px 100px 100px;
+  pointer-events: none;
+}
+
+/* ÉTAT ACTIF / ENTRÉE : Avancée au premier plan (scale 1) + visible */
+.liquid-glass-toast.show {
+  opacity: 1;
+  transform: translate(-50%, 0) scale(1);
+}
+
+/* Animation Shake en cas de blocage */
+.liquid-glass-toast.shake {
+  animation: toast-shake 0.35s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes toast-shake {
+  10%, 90% { transform: translate(calc(-50% - 4px), 0) scale(1); }
+  20%, 80% { transform: translate(calc(-50% + 6px), 0) scale(1); }
+  30%, 50%, 70% { transform: translate(calc(-50% - 8px), 0) scale(1); }
+  40%, 60% { transform: translate(calc(-50% + 8px), 0) scale(1); }
+}
+
+/* ── EFFET ROUGE SUR LES FLÈCHES ── */
+.btn-arrow.arrow-blocked {
+  --btn-bg: #e53935 !important;
+  --btn-shadow: #b71c1c !important;
+  animation: arrow-headshake 0.3s ease-in-out;
+}
+
+@keyframes arrow-headshake {
+  0% { transform: scale(1); }
+  30% { transform: scale(0.92); }
+  60% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* ── ANIMATION GAME OVER (2 CLIGNOTEMENTS ROUGES) ── */
+.btn-arrow.arrow-gameover-blink {
+  animation: arrow-blink-red 0.4s ease-in-out 2;
+}
+
+@keyframes arrow-blink-red {
+  0%, 100% {
+    --btn-bg: #0288d1;
+    --btn-shadow: #01579b;
+  }
+  50% {
+    --btn-bg: #e53935;
+    --btn-shadow: #b71c1c;
+  }
+}
+
+/* ── ÉTAT GRISÉ / INCLIQUABLE DES BOUTONS ── */
+.btn-arrow.arrow-disabled {
+  --btn-bg: #616161 !important;
+  --btn-shadow: #37474f !important;
+  opacity: 0.55;
+  cursor: not-allowed !important;
+  pointer-events: none !important; /* Rend le bouton totalement incliquable */
+  transform: none !important;
+  filter: grayscale(0.8) !important;
 }

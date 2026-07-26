@@ -1,153 +1,123 @@
 <!doctype html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>H2O48 : The Fusion Lab</title>
-    <link rel="stylesheet" href="style.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Bungee&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-    />
-    <link rel="icon" href="Assets/Img/favicon-transparent.png" type="image/png" />
-  </head>
-  <body>
-    <header>
-      <div id="header-wrapper">
-        <div id="header-main">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>H2O48 : The Fusion Lab</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+  <link rel="icon" href="Assets/Img/favicon-transparent.png" type="image/png" />
+</head>
+
+<body>
+  <header>
+    <div id="header-wrapper">
+      <div id="header-main">
+        <div id="header-t&htp">
           <h1 id="hello-txt">
-            Bienvenue dans&nbsp;<span id="H-H2O48-ht">H</span>2<span
-              id="O-H2O48-ht"
-              >O</span
-            >48 !
+            Bienvenue dans&nbsp;<span id="H-H2O48-ht">H</span>2<span id="O-H2O48-ht">O</span>48 !
           </h1>
-          <div id="header-scores">
-            <p id="score">Score : <span id="score-value">0</span></p>
-            <p id="best-score">
-              Meilleur Score : <span id="best-score-value">0</span>
-            </p>
-            <p id="time-txt">
-              <span id="time-min">0 min</span>, <span id="time-sec">0 sec</span>
-            </p>
-            <p id="time-chronoMode">60</p>
-          </div>
+          <button class="btn-how-to-play" onclick="showHowToPlay()">
+            <span>Comment Jouer ?</span>
+          </button>
         </div>
-        <div id="header-settings"></div>
-      </div>
-      <button id="btn-settings" aria-label="Paramètres" onclick="toggleSettings()">
-        <svg
-          id="icon-settings"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 512 512"
-        >
-          <path
-            fill="currentColor"
-            d="M444.788 291.1l42.616 24.599c4.867 2.809 7.126 8.618 5.459 13.985-11.07 35.642-29.97 67.842-54.689 94.586a12.016 12.016 0 0 1-14.832 2.254l-42.584-24.595a191.577 191.577 0 0 1-60.759 35.13v49.182a12.01 12.01 0 0 1-9.377 11.718c-34.956 7.85-72.499 8.256-109.219.007-5.49-1.233-9.403-6.096-9.403-11.723v-49.184a191.555 191.555 0 0 1-60.759-35.13l-42.584 24.595a12.016 12.016 0 0 1-14.832-2.254c-24.718-26.744-43.619-58.944-54.689-94.586-1.667-5.366.592-11.175 5.459-13.985L67.212 291.1a193.48 193.48 0 0 1 0-70.199l-42.616-24.599c-4.867-2.809-7.126-8.618-5.459-13.985 11.07-35.642 29.97-67.842 54.689-94.586a12.016 12.016 0 0 1 14.832-2.254l42.584 24.595a191.577 191.577 0 0 1 60.759-35.13V25.759a12.01 12.01 0 0 1 9.377-11.718c34.956-7.85 72.499-8.256 109.219-.007 5.49 1.233 9.403 6.096 9.403 11.723v49.184a191.555 191.555 0 0 1 60.759 35.13l42.584-24.595a12.016 12.016 0 0 1 14.832-2.254c24.718 26.744 43.619 58.944 54.689 94.586 1.667 5.366-.592 11.175-5.459 13.985L444.788 220.9a193.485 193.485 0 0 1 0 70.2zM336 256c0-44.112-35.888-80-80-80s-80 35.888-80 80 35.888 80 80 80 80-35.888 80-80z"
-          />
-        </svg>
-      </button>
-    </header>
-
-    <main>
-      <div class="game-settings-row">
-        <div class="play-area">
-          <div id="info-arrows">
-            <button
-              class="btn-base btn-arrow arrow-left"
-              onclick="moveAndStartTimer('left')"
-            >
-              <span class="arrow-icon left">↑</span>
-            </button>
-            <button
-              class="btn-base btn-arrow arrow-up"
-              onclick="moveAndStartTimer('up')"
-            >
-              <span class="arrow-icon up">↑</span>
-            </button>
-            <button
-              class="btn-base btn-arrow arrow-right"
-              onclick="moveAndStartTimer('right')"
-            >
-              <span class="arrow-icon right">↑</span>
-            </button>
-            <button
-              class="btn-base btn-arrow arrow-down"
-              onclick="moveAndStartTimer('down')"
-            >
-              <span class="arrow-icon down">↑</span>
-            </button>
-          </div>
-          <div id="game"></div>
-        </div>
-        <div id="settings-play">
-          <div class="param-card toggle-control">
-            <span class="toggle-control__label">Temps</span>
-            <label class="switch">
-              <input type="checkbox" id="toggle-timer" />
-              <span class="slider"></span>
-            </label>
-          </div>
-          <div class="param-card toggle-control">
-            <span class="toggle-control__label">Son</span>
-            <label class="switch">
-              <input type="checkbox" id="toggle-sound" checked />
-              <span class="slider"></span>
-            </label>
-          </div>
-          <button
-            class="param-card btn-base action-btn"
-            onclick="restartGame()"
-          >
-            Rejouer
-          </button>
-          <button
-            class="param-card btn-base action-btn resetBestScore"
-            onclick="resetBestScore()"
-          >
-            Réinitialiser Record
-          </button>
-
-          <button
-            class="param-card btn-base action-btn"
-            onclick="changeGridSize()"
-          >
-            grille : <span id="value-grid-left">6</span>x<span
-              id="value-grid-right"
-              >6</span
-            >
-          </button>
-          <button class="param-card btn-base action-btn" onclick="changeGoal()">
-            Objectif : <span id="value-goal">2048</span>
-          </button>
-          <button class="param-card btn-base action-btn" onclick="changeMode()">
-            Mode : <span id="value-mode">Normal</span>
-          </button>
-          <button class="param-card btn-base action-btn" onclick="changeKeyboard()"><span id="value-keyboard" class="value-keyboard">flèches + WASD</span></button>
+        <div id="header-scores">
+          <p id="score">Score : <span id="score-value">0</span></p>
+          <p id="best-score">
+            Meilleur Score : <span id="best-score-value">0</span>
+          </p>
+          <p id="time-txt">
+            <span id="time-min">0 min</span>, <span id="time-sec">0 sec</span>
+          </p>
+          <p id="time-chronoMode">60</p>
         </div>
       </div>
-    </main>
+      <div id="header-settings"></div>
+    </div>
+    <button id="btn-settings" aria-label="Paramètres" onclick="toggleSettings()">
+      <svg id="icon-settings" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+        <path fill="currentColor"
+          d="M444.788 291.1l42.616 24.599c4.867 2.809 7.126 8.618 5.459 13.985-11.07 35.642-29.97 67.842-54.689 94.586a12.016 12.016 0 0 1-14.832 2.254l-42.584-24.595a191.577 191.577 0 0 1-60.759 35.13v49.182a12.01 12.01 0 0 1-9.377 11.718c-34.956 7.85-72.499 8.256-109.219.007-5.49-1.233-9.403-6.096-9.403-11.723v-49.184a191.555 191.555 0 0 1-60.759-35.13l-42.584 24.595a12.016 12.016 0 0 1-14.832-2.254c-24.718-26.744-43.619-58.944-54.689-94.586-1.667-5.366.592-11.175 5.459-13.985L67.212 291.1a193.48 193.48 0 0 1 0-70.199l-42.616-24.599c-4.867-2.809-7.126-8.618-5.459-13.985 11.07-35.642 29.97-67.842 54.689-94.586a12.016 12.016 0 0 1 14.832-2.254l42.584 24.595a191.577 191.577 0 0 1 60.759-35.13V25.759a12.01 12.01 0 0 1 9.377-11.718c34.956-7.85 72.499-8.256 109.219-.007 5.49 1.233 9.403 6.096 9.403 11.723v49.184a191.555 191.555 0 0 1 60.759 35.13l42.584-24.595a12.016 12.016 0 0 1 14.832-2.254c24.718 26.744 43.619 58.944 54.689 94.586 1.667 5.366-.592 11.175-5.459 13.985L444.788 220.9a193.485 193.485 0 0 1 0 70.2zM336 256c0-44.112-35.888-80-80-80s-80 35.888-80 80 35.888 80 80 80 80-35.888 80-80z" />
+      </svg>
+    </button>
+  </header>
 
-    <footer>
-      <div id="dev-mode">
-        <div id="dev-mode-top-row">
-          <input type="number" id="dev-value" placeholder="Valeur" />
-          <button id="info-dev-mode" onclick="vPossiblesDisplay()">
-            <i class="fa-solid fa-circle-info"></i>
+  <main>
+    <div class="game-settings-row">
+      <div class="play-area">
+        <div id="info-arrows">
+          <button class="btn-base btn-arrow arrow-left" onclick="moveAndStartTimer('left')">
+            <span class="arrow-icon left">↑</span>
+          </button>
+          <button class="btn-base btn-arrow arrow-up" onclick="moveAndStartTimer('up')">
+            <span class="arrow-icon up">↑</span>
+          </button>
+          <button class="btn-base btn-arrow arrow-right" onclick="moveAndStartTimer('right')">
+            <span class="arrow-icon right">↑</span>
+          </button>
+          <button class="btn-base btn-arrow arrow-down" onclick="moveAndStartTimer('down')">
+            <span class="arrow-icon down">↑</span>
           </button>
         </div>
-        <div id="vPossibles"></div>
-        <button id="btnToggleDev" onclick="toggleDevMode()">
-          Mode Dev : OFF
+        <div id="game"></div>
+      </div>
+      <div id="settings-play">
+        <div class="param-card toggle-control">
+          <span class="toggle-control__label">Temps</span>
+          <label class="switch">
+            <input type="checkbox" id="toggle-timer" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="param-card toggle-control">
+          <span class="toggle-control__label">Son</span>
+          <label class="switch">
+            <input type="checkbox" id="toggle-sound" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <button class="param-card btn-base action-btn" onclick="restartGame()">
+          Rejouer
         </button>
-        <p id="dev-status">Clic Gauche : Placer | Clic Droit : Supprimer</p>
+        <button class="param-card btn-base action-btn resetBestScore" onclick="resetBestScore()">
+          Réinitialiser Record
+        </button>
+
+        <button class="param-card btn-base action-btn" onclick="changeGridSize()">
+          grille : <span id="value-grid-left">6</span>x<span id="value-grid-right">6</span>
+        </button>
+        <button class="param-card btn-base action-btn" onclick="changeGoal()">
+          Objectif : <span id="value-goal">2048</span>
+        </button>
+        <button class="param-card btn-base action-btn" onclick="changeMode()">
+          Mode : <span id="value-mode">Normal</span>
+        </button>
+        <button class="param-card btn-base action-btn" onclick="changeKeyboard()"><span id="value-keyboard"
+            class="value-keyboard">flèches + WASD</span></button>
       </div>
-    </footer>
-    <script src="script.js"></script>
-  </body>
+    </div>
+  </main>
+
+  <footer>
+    <div id="dev-mode">
+      <div id="dev-mode-top-row">
+        <input type="number" id="dev-value" placeholder="Valeur" />
+        <button id="info-dev-mode" onclick="vPossiblesDisplay()">
+          <i class="fa-solid fa-circle-info"></i>
+        </button>
+      </div>
+      <div id="vPossibles"></div>
+      <button id="btnToggleDev" onclick="toggleDevMode()">
+        Mode Dev : OFF
+      </button>
+      <p id="dev-status">Clic Gauche : Placer | Clic Droit : Supprimer</p>
+    </div>
+  </footer>
+  <script src="script.js"></script>
+</body>
+
 </html>
