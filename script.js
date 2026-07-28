@@ -1176,7 +1176,6 @@ soundCheckbox.addEventListener("change", (e) => {
 /* LOGIQUE MODALE "COMMENT JOUER"            */
 /* ========================================= */
 
-// La fonction showHowToPlay() est déjà liée au bouton dans index.html
 function showHowToPlay() {
   const modal = document.getElementById("how-to-play-modal");
   if (modal) {
@@ -1189,7 +1188,7 @@ function closeHowToPlay() {
   if (modal) {
     modal.classList.remove("visible");
     
-    // Sauvegarde l'état de la checkbox dans le localStorage à la fermeture
+    // Sauvegarde de l'état de la checkbox
     const disableCheckbox = document.getElementById("disable-startup-modal");
     if (disableCheckbox) {
       localStorage.setItem("hideHowToPlayStartup", disableCheckbox.checked);
@@ -1197,45 +1196,82 @@ function closeHowToPlay() {
   }
 }
 
-// Vérification au lancement du jeu
+// Initialisation et animation de la nouvelle checkbox
 document.addEventListener("DOMContentLoaded", () => {
   const hideAtStartup = localStorage.getItem("hideHowToPlayStartup") === "true";
   const disableCheckbox = document.getElementById("disable-startup-modal");
-  
+  const checkAudio = new Audio('Assets/Sounds/check.mp3');
+
   if (disableCheckbox) {
-    // Restaure l'état visuel de la checkbox selon le localStorage
     disableCheckbox.checked = hideAtStartup;
+    
+    // Applique directement l'état visuel au chargement si coché
+    if (hideAtStartup) {
+      const taskItem = disableCheckbox.closest('.task-item');
+      if (taskItem) {
+        taskItem.classList.add('done');
+        taskItem.style.setProperty('--text-line-scale', '1');
+      }
+    }
+
+    // Animation au clic / changement d'état
+    disableCheckbox.addEventListener('change', e => {
+      const task = e.target.closest('.task-item');
+      const checkbox = task.querySelector('.checkbox');
+
+      if (e.target.checked) {
+        // Joue le son s'il existe
+        checkAudio.play().catch(() => {});
+
+        checkbox.animate([
+          { offsetPath: 'none', '--checkbox-lines-offset': '13.5px' },
+          { '--checkbox-lines-offset': '4.5px' }
+        ], {
+          duration: 200,
+          delay: 200,
+          fill: 'forwards'
+        });
+
+        const textAnimation = task.animate([
+          { '--text-line-scale': 0, '--text-x': '0px', offset: 0 },
+          { '--text-line-scale': 1, '--text-x': '2px', offset: 0.5 },
+          { '--text-line-scale': 1, '--text-x': '0px', offset: 1 }
+        ], {
+          duration: 300,
+          fill: 'forwards'
+        });
+
+        textAnimation.onfinish = () => {
+          task.style.setProperty('--text-line-scale', '1');
+          task.style.setProperty('--text-x', '0px');
+          task.classList.add('done');
+        };
+
+        return;
+      }
+
+      // Décocher
+      const reverseAnimation = task.animate([
+        { '--text-line-scale': 1 },
+        { '--text-line-scale': 0 }
+      ], {
+        duration: 250,
+        fill: 'forwards'
+      });
+
+      reverseAnimation.onfinish = () => {
+        task.style.setProperty('--text-line-scale', '0');
+        task.classList.remove('done');
+      };
+    });
   }
   
   if (!hideAtStartup) {
-    // Léger délai pour que l'animation d'entrée soit fluide après le chargement
     setTimeout(() => {
       showHowToPlay();
     }, 400);
   }
 });
-
-function triggerRestartAnimation() {
-  const iconRestart = document.getElementById("icon-restart");
-  if (!iconRestart) return;
-
-  // Retire la classe pour stopper l'état précédent si elle y est encore
-  iconRestart.classList.remove("is-spinning");
-  
-  // Force un reflow du navigateur (astuce pour réinitialiser l'animation CSS)
-  void iconRestart.offsetWidth;
-  
-  // Ajoute la classe qui déclenche l'animation de rotation complète
-  iconRestart.classList.add("is-spinning");
-
-  // Lance la logique de redémarrage du jeu
-
-  // Retire la classe une fois l'animation terminée (ex: après 1 seconde)
-  setTimeout(() => {
-    iconRestart.classList.remove("is-spinning");
-    restartGame();
-  }, 1000);
-}
 
 // Initialisation du jeu complet
 initBackground();

@@ -1485,8 +1485,8 @@ body.dev-active .tile:hover {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background-color: transparent;
+  border: none;
   color: white;
   font-size: 16px;
   display: flex;
@@ -1643,48 +1643,155 @@ body.dev-active .tile:hover {
   box-sizing: border-box;
 }
 
-.glass-checkbox-label {
+.task-item {
+  --text-color: #fff;
+  --text-line-scale: 0;
+  --text-x: 0px;
+  --border-default: rgba(255, 255, 255, 0.4);
+  --border-hover: #ffffff;
+  --checkbox-active: #749ffc;
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-family: -apple-system, sans-serif;
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.9);
-  cursor: pointer;
+  border-radius: 12px;
+  overflow: hidden;
+  padding: 4px 12px;
+  mask-image: -webkit-radial-gradient(white, black);
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+  transition: background .15s linear;
+}
+
+.task-item:not(.done):hover {
+  --blur-x: 372px;
+  --blur-o: 1;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.task-item:before {
+  content: '';
+  position: absolute;
+  width: 32px;
+  height: 6px;
+  right: 100%;
+  top: -11px;
+  border-radius: 50%;
+  box-shadow: 0px 4px 4px var(--checkbox-active);
+  transform: translateX(var(--blur-x, 0));
+  opacity: var(--blur-o, 0);
+  transition: opacity .15s, transform 1.2s;
+}
+
+.task-item.done {
+  --checkbox-active: rgba(255, 255, 255, 0.3);
+  --text-color: rgba(255, 255, 255, 0.5);
+  --text-line-scale: 1;
+}
+
+.task-item .text {
+  display: block;
+  letter-spacing: -.05px;
+  text-decoration: none;
+  color: var(--text-color);
+  position: relative;
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transform: translateX(var(--text-x)) translateZ(0);
+  transition: color .25s;
   user-select: none;
 }
 
-.glass-checkbox-label input {
-  display: none;
+.task-item .text:before {
+  content: '';
+  position: absolute;
+  height: 1px;
+  left: -2px;
+  right: -2px;
+  top: 50%;
+  transform-origin: 0 50%;
+  transform: translateY(-50%) scaleX(var(--text-line-scale)) translateZ(0);
+  background: currentColor;
+  transition: transform .25s ease;
 }
 
-.glass-checkbox-custom {
-  width: 20px;
-  height: 20px;
-  border-radius: 5px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
+.task-item .checkbox {
+  --active-tick: #ffffff;
+  --checkbox-lines-offset: 13.5px;
+  display: block;
+  padding: 10px 10px 10px 0;
+  cursor: pointer;
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.glass-checkbox-custom i {
-  color: white;
-  font-size: 11px;
-  opacity: 0;
-  transform: scale(0.5);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+.task-item .checkbox svg {
+  display: block;
+  position: absolute;
 }
 
-.glass-checkbox-label input:checked + .glass-checkbox-custom {
-  background: #0288d1;
-  border-color: #4fc3f7;
-  box-shadow: 0 0 10px rgba(79, 195, 247, 0.5);
+.task-item .checkbox input {
+  display: block;
+  outline: none;
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
 }
 
-.glass-checkbox-label input:checked + .glass-checkbox-custom i {
-  opacity: 1;
-  transform: scale(1);
+.task-item .checkbox input + svg {
+  width: 21px;
+  height: 18px;
+  left: 0px;
+  top: 10px;
+  color: var(--checkbox-active);
+  transition: color .25s linear;
+}
+
+.task-item .checkbox input + svg .shape {
+  stroke-width: 1.5px;
+  stroke: var(--border, var(--border-default));
+  fill: var(--background, none);
+  transition: fill .25s linear, stroke .25s linear;
+}
+
+.task-item .checkbox input + svg .tick {
+  stroke-dasharray: 20;
+  stroke-dashoffset: var(--checkbox-tick-offset, 20px);
+  transition: stroke-dashoffset var(--checkbox-tick-duration, .15s) var(--checkbox-tick-easing, ease);
+}
+
+.task-item .checkbox input + svg .tick.mask {
+  stroke: var(--active-tick);
+}
+
+.task-item .checkbox input + svg + svg {
+  width: 11px;
+  height: 11px;
+  fill: none;
+  stroke: var(--checkbox-active);
+  stroke-width: 1.25;
+  stroke-linecap: round;
+  top: 4px;
+  right: 10px;
+  stroke-dasharray: 4.5px;
+  stroke-dashoffset: var(--checkbox-lines-offset);
+  pointer-events: none;
+}
+
+.task-item .checkbox input:checked + svg {
+  --background: var(--checkbox-active);
+  --border: var(--checkbox-active);
+  --checkbox-tick-duration: .2s;
+  --checkbox-tick-easing: cubic-bezier(0, .45, 1, .5);
+  --checkbox-tick-offset: 0;
+}
+
+.task-item .checkbox:hover input:not(:checked) + svg {
+  --border: var(--border-hover);
 }
