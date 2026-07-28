@@ -3,14 +3,16 @@ html {
 }
 
 body {
-  min-height: 100vh;
-  margin: 6px 0 24px;
-  padding: 0;
+  min-height: 100dvh;
+  margin: 6px 0 0;
+  padding: 0 0 0;
   background: linear-gradient(to right, blue, purple);
   font-family: "Bungee", sans-serif;
   font-weight: 400;
   font-style: normal;
   color: white;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 }
 
@@ -301,7 +303,6 @@ body {
   display: flex;
   position: absolute;
   right: 15vh;
-  /* Ajoutez ces lignes pour qu'il suive la transition de l'en-tête */
   transition: right 0.7s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -357,6 +358,231 @@ body {
   display: flex;
 }
 
+.site-footer {
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 18px 8px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1200;
+}
+
+.footer-shell {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 4px 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+  margin: 0 auto;
+}
+
+.footer-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1 1 0;
+}
+
+.footer-links {
+  justify-content: flex-start;
+}
+
+.footer-profile {
+  justify-content: flex-end;
+}
+
+.footer-pill,
+.footer-profile-card {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.88);
+  text-decoration: none;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-family: "Bungee", sans-serif;
+  transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.footer-pill:hover,
+.footer-profile-card:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.footer-brand {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  white-space: nowrap;
+  opacity: 0.95;
+  pointer-events: none;
+}
+
+.footer-brand i {
+  color: #74c0fc;
+  font-size: 11px;
+}
+
+.footer-profile-card img {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  object-fit: cover;
+}
+
+.glass-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 220;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(4, 6, 14, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.24s ease;
+}
+
+.glass-modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.glass-modal-card {
+  width: min(500px, 100%);
+  padding: 22px 24px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.04));
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  color: #fff;
+  transform: translateY(8px) scale(0.98);
+  transition: transform 0.24s ease;
+}
+
+.glass-modal-overlay.active .glass-modal-card {
+  transform: translateY(0) scale(1);
+}
+
+.glass-modal-title {
+  margin-bottom: 10px;
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #7ed2ff;
+  font-family: "Bungee", sans-serif;
+}
+
+.glass-modal-body {
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.84);
+  font-family: "Bungee", sans-serif;
+}
+
+.glass-modal-body p {
+  margin: 0 0 8px;
+}
+
+.glass-modal-body a {
+  color: #7ed2ff;
+  text-decoration: none;
+}
+
+.glass-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.glass-modal-btn {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-family: "Bungee", sans-serif;
+  transition: background 0.2s ease, transform 0.2s ease;
+  text-decoration: none;
+}
+
+.glass-modal-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  transform: translateY(-1px);
+}
+
+.glass-modal-btn--primary {
+  background: rgba(116, 192, 252, 0.18);
+  border-color: rgba(116, 192, 252, 0.3);
+}
+
+@media (max-width: 720px) {
+  .site-footer {
+    padding: 0 12px 14px;
+  }
+
+  .footer-shell {
+    grid-template-columns: 1fr;
+    border-radius: 20px;
+    justify-items: center;
+    padding: 14px;
+  }
+
+  .footer-links,
+  .footer-profile {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .footer-brand {
+    order: -1;
+    margin-bottom: 2px;
+  }
+}
+
 /* ── LAYOUT ── */
 main {
   display: flex;
@@ -364,6 +590,9 @@ main {
   align-items: center;
   justify-content: flex-start;
   width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
 }
 .game-settings-row {
   display: flex;
@@ -888,6 +1117,13 @@ body.settings-open #icon-settings {
   background: rgba(255, 255, 255, 0.1);
 }
 
+#settings-play .action-btn:disabled {
+  cursor: default;
+  opacity: 0.5;
+  transform: none;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
 #settings-play .action-btn.resetBestScore:hover {
   color: rgba(255, 23, 23, 0.7);
 }
@@ -939,6 +1175,17 @@ body.settings-open #icon-settings {
   z-index: 1000;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
   min-width: 200px;
+}
+
+body.show-debug .site-footer {
+  z-index: 1400;
+}
+
+body.show-debug .footer-profile-card {
+  position: fixed;
+  right: 20px;
+  bottom: 170px;
+  z-index: 1450;
 }
 body.show-debug #dev-mode {
   display: flex;

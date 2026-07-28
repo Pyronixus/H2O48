@@ -743,9 +743,24 @@ function restartGame() {
 score.textContent = currentScore;
 bestScore.textContent = maxScore;
 
+function updateSettingsPanelButtons() {
+  const settingsPanel = document.getElementById("settings-play");
+  if (!settingsPanel) return;
+
+  const isOpen = document.body.classList.contains("settings-open");
+  const buttons = settingsPanel.querySelectorAll("button");
+
+  buttons.forEach((button) => {
+    button.disabled = !isOpen;
+  });
+}
+
 function toggleSettings() {
   document.body.classList.toggle("settings-open");
+  updateSettingsPanelButtons();
 }
+
+updateSettingsPanelButtons();
 
 // Timer Logic
 const timeCheckbox = document.getElementById("toggle-timer");
@@ -1296,6 +1311,81 @@ function triggerRestartAnimation() {
     restartGame();
   }, 1000);
 }
+
+// modals footer
+
+const modalTriggers = document.querySelectorAll('[data-open-modal]');
+    const modalOverlays = document.querySelectorAll('.glass-modal-overlay');
+
+    modalTriggers.forEach((trigger) => {
+      trigger.addEventListener('click', () => {
+        const targetId = trigger.getAttribute('data-open-modal');
+        const targetModal = document.getElementById(targetId);
+        if (targetModal) {
+          targetModal.classList.add('active');
+        }
+      });
+    });
+
+    document.querySelectorAll('.glass-modal-close').forEach((button) => {
+      button.addEventListener('click', () => {
+        button.closest('.glass-modal-overlay')?.classList.remove('active');
+      });
+    });
+
+    modalOverlays.forEach((overlay) => {
+      overlay.addEventListener('click', (event) => {
+        if (event.target === overlay) {
+          overlay.classList.remove('active');
+        }
+      });
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        modalOverlays.forEach((overlay) => overlay.classList.remove('active'));
+      }
+    });
+
+
+//modals
+
+const footerModalTriggers = document.querySelectorAll('[data-open-modal]');
+    const footerModals = document.querySelectorAll('.glass-modal-overlay');
+
+    footerModalTriggers.forEach((trigger) => {
+      trigger.addEventListener('click', () => {
+        const targetId = trigger.getAttribute('data-open-modal');
+        const targetModal = document.getElementById(targetId);
+        if (!targetModal) return;
+
+        footerModals.forEach((modal) => {
+          modal.classList.remove('active');
+        });
+
+        targetModal.classList.add('active');
+      });
+    });
+
+    document.querySelectorAll('.glass-modal-close').forEach((button) => {
+      button.addEventListener('click', () => {
+        button.closest('.glass-modal-overlay')?.classList.remove('active');
+      });
+    });
+
+    footerModals.forEach((overlay) => {
+      overlay.addEventListener('click', (event) => {
+        if (event.target === overlay) {
+          overlay.classList.remove('active');
+        }
+      });
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        footerModals.forEach((overlay) => overlay.classList.remove('active'));
+      }
+    });
 
 // Initialisation du jeu complet
 initBackground();

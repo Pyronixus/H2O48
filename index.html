@@ -104,21 +104,68 @@
     </div>
   </main>
 
-  <footer>
-    <div id="dev-mode">
-      <div id="dev-mode-top-row">
-        <input type="number" id="dev-value" placeholder="Valeur" />
-        <button id="info-dev-mode" onclick="vPossiblesDisplay()">
+  <div id="dev-mode">
+    <div id="dev-mode-top-row">
+      <input type="number" id="dev-value" placeholder="Valeur" />
+      <button id="info-dev-mode" onclick="vPossiblesDisplay()">
+        <i class="fa-solid fa-circle-info"></i>
+      </button>
+    </div>
+    <div id="vPossibles"></div>
+    <button id="btnToggleDev" onclick="toggleDevMode()">
+      Mode Dev : OFF
+    </button>
+    <p id="dev-status">Clic Gauche : Placer | Clic Droit : Supprimer</p>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-shell">
+      <div class="footer-group footer-links">
+        <button class="footer-pill" type="button" data-open-modal="modal-source">
           <i class="fa-solid fa-circle-info"></i>
+          <span>Open-source</span>
+        </button>
+        <a class="footer-pill" href="https://github.com/Pyronixus/H2O48" target="_blank" rel="noreferrer">
+          <i class="fa-solid fa-code-branch"></i>
+          <span>Dépot GitHub</span>
+        </a>
+      </div>
+
+      <div class="footer-group footer-profile">
+        <button class="footer-profile-card" type="button" data-open-modal="modal-pyro">
+          <img src="https://avatars.githubusercontent.com/u/264767398?v=4&size=64" alt="Pyronixus" />
+          <span>Pyronixus</span>
         </button>
       </div>
-      <div id="vPossibles"></div>
-      <button id="btnToggleDev" onclick="toggleDevMode()">
-        Mode Dev : OFF
-      </button>
-      <p id="dev-status">Clic Gauche : Placer | Clic Droit : Supprimer</p>
     </div>
   </footer>
+
+  <div class="glass-modal-overlay" id="modal-source">
+    <div class="glass-modal-card">
+      <div class="glass-modal-title">Open-source</div>
+      <div class="glass-modal-body">
+        <p>H2O48 est un projet libre et pensé pour être expérimenté, remixé et amélioré.</p>
+        <p>Le code est disponible sur GitHub sous licence MIT, avec une approche simple, claire et modulable pour l’apprentissage et la personnalisation.</p>
+      </div>
+      <div class="glass-modal-actions">
+        <a class="glass-modal-btn glass-modal-btn--primary" href="https://github.com/Pyronixus/H2O48" target="_blank" rel="noreferrer">Dépot GitHub</a>
+        <button class="glass-modal-btn glass-modal-close" type="button">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="glass-modal-overlay" id="modal-pyro">
+    <div class="glass-modal-card">
+      <div class="glass-modal-title">À propos</div>
+      <div class="glass-modal-body">
+        <p>H2O48 est une interprétation moderne du 2048, conçue comme un laboratoire interactif où l’esthétique, le gameplay et l’interface se fondent en un seul univers.</p>
+        <p>Le projet est porté par Pyronixus, avec un souci constant d’harmonie visuelle et de fluidité pour une expérience unique, optimale et authentique.</p>
+      </div>
+      <div class="glass-modal-actions">
+        <a class="glass-modal-btn glass-modal-btn--primary" href="https://github.com/Pyronixus" target="_blank" rel="noreferrer">Profil GitHub</a>
+        <button class="glass-modal-btn glass-modal-close" type="button">Fermer</button>
+      </div>
+    </div>
+  </div>
   <script src="script.js"></script>
   <!-- MODALE COMMENT JOUER (GLASSMORPHISM) -->
   <div id="how-to-play-modal" class="modal-glass-overlay">
