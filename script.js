@@ -60,9 +60,15 @@ function updateView() {
     const x = index % GRID_SIZE;
     const y = Math.floor(index / GRID_SIZE);
 
+    const isNegative = tile.value < 0;
+    const absValue = Math.abs(tile.value);
+    const tileClass = isNegative
+      ? `tile-neg tile-neg-${absValue}`
+      : `tile-${tile.value}`;
+
     if (!tile.element) {
       const newtile = document.createElement("div");
-      newtile.className = `tile tile-${tile.value} tile-new`;
+      newtile.className = `tile ${tileClass} tile-new`;
       const spanTexte = document.createElement("span");
       spanTexte.textContent = tile.value;
       newtile.appendChild(spanTexte);
@@ -72,23 +78,11 @@ function updateView() {
       newtile.addEventListener("mousedown", (e) => {
         if (isDevMode && e.button === 2) {
           e.preventDefault();
-          // Fix : Récupérer dynamiquement l'index car la tuile a pu bouger
           let currentIndex = grid.indexOf(tile);
           if (currentIndex !== -1) {
             newtile.remove();
             grid[currentIndex] = null;
           }
-          startHoldAction(() => {
-            let dynIndex = grid.indexOf(tile);
-            if (dynIndex !== -1 && grid[dynIndex] !== null) {
-              grid[dynIndex].element?.remove();
-              grid[dynIndex] = null;
-            }
-          });
-        } else if (!isDevMode && e.button === 0) {
-          newtile.classList.remove("animate-flip");
-          void newtile.offsetWidth; // Force reflow pour relancer l'animation
-          newtile.classList.add("animate-flip");
         }
       });
 
@@ -99,7 +93,7 @@ function updateView() {
     } else {
       tile.element.style.setProperty("--x", x);
       tile.element.style.setProperty("--y", y);
-      tile.element.className = `tile tile-${tile.value}`;
+      tile.element.className = `tile ${tileClass}`;
       tile.element.querySelector("span").textContent = tile.value;
       if (tile.merged) {
         tile.element.classList.add("tile-merged");
@@ -109,14 +103,51 @@ function updateView() {
   });
 }
 
+function getRandomNegativeValue() {
+  // Liste des puissances de 2 négatives
+  const negValues = [-2, -4, -8, -16, -32, -64, -128, -256, -512, -1024, -2048];
+
+  // Poids de probabilité : les petites valeurs ont plus de chances d'apparaître
+  const weights = [40, 25, 15, 8, 5, 3, 2, 1, 0.5, 0.3, 0.2];
+
+  let totalWeight = weights.reduce((acc, w) => acc + w, 0);
+  let randomNum = Math.random() * totalWeight;
+
+  for (let i = 0; i < negValues.length; i++) {
+    if (randomNum < weights[i]) {
+      return negValues[i];
+    }
+    randomNum -= weights[i];
+  }
+  return -2;
+}
+
 function spawnTile() {
   let emptyTiles = grid
     .map((val, idx) => (val === null ? idx : null))
     .filter((val) => val !== null);
   if (emptyTiles.length === 0) return;
   let randomIndex = emptyTiles[Math.floor(Math.random() * emptyTiles.length)];
+
+  let val;
+
+  if (currentMode === "Négatifs" || currentMode === "Hard") {
+    if (Math.random() < 0.1) {
+      val = getRandomNegativeValue(); // Génère une valeur négative (ex: -2, -4...)
+    } else {
+      val = Math.random() < 0.9 ? 2 : 4;
+    }
+  } else {
+    val = Math.random() < 0.9 ? 2 : 4;
+  }
+
+  // Si c'est un négatif qui spawn, son impact est directement appliqué au score
+  if (val < 0) {
+    updateScore(val); // Soustrait la valeur du score actuel
+  }
+
   grid[randomIndex] = {
-    value: Math.random() < 0.9 ? 2 : 4,
+    value: val,
     element: null,
     merged: false,
   };
@@ -126,40 +157,130 @@ function spawnTile() {
 function slide(line, indices) {
   let newLine = Array(GRID_SIZE).fill(null);
   let j = 0;
+
   for (let i = 0; i < line.length; i++) {
     if (line[i] === null) continue;
 
-    // Check Fusion
-    if (
-      j > 0 &&
-      newLine[j - 1] !== null &&
-      newLine[j - 1].value === line[i].value &&
-      !newLine[j - 1].merged
-    ) {
-      const oldTile = line[i];
-      const mergeValue = oldTile.value * 2;
-      newLine[j - 1].value = mergeValue;
-      newLine[j - 1].merged = true;
-      updateScore(mergeValue);
-      playSound("merge");
+    const currentTile = line[i];
+    const prevTile = j > 0 ? newLine[j - 1] : null;
 
-      // Fix Visuel : Déplacer l'ancienne tuile vers sa cible avant de la détruire
-      const targetIdx = indices[j - 1];
-      const targetX = targetIdx % GRID_SIZE;
-      const targetY = Math.floor(targetIdx / GRID_SIZE);
+    if (prevTile !== null && !prevTile.merged) {
+      // CAS 1 : ANNULATION (ex: -2 et 2, ou -16 et 16)
+      if (prevTile.value === -currentTile.value) {
+        // L'annulation libère le plateau : on rembourse le négatif et on crédite le bonus
+        const pointsGagnes = Math.abs(currentTile.value) * 2;
+        updateScore(pointsGagnes);
+        playSound("merge");
 
-      if (oldTile.element) {
-        oldTile.element.style.setProperty("--x", targetX);
-        oldTile.element.style.setProperty("--y", targetY);
-        oldTile.element.style.zIndex = "1";
-        setTimeout(() => oldTile.element.remove(), 250);
+        const targetIdx = indices[j - 1];
+        const targetX = targetIdx % GRID_SIZE;
+        const targetY = Math.floor(targetIdx / GRID_SIZE);
+
+        const currentElem = currentTile.element;
+        const prevElem = prevTile.element;
+
+        if (currentElem) {
+          currentElem.style.setProperty("--x", targetX);
+          currentElem.style.setProperty("--y", targetY);
+          currentElem.style.zIndex = "2";
+          currentElem.classList.add("animate-cancel");
+          setTimeout(() => currentElem.remove(), 300);
+        }
+
+        if (prevElem) {
+          prevElem.classList.add("animate-cancel");
+          setTimeout(() => prevElem.remove(), 300);
+        }
+
+        triggerBoardShake();
+        triggerShockwave(targetX, targetY);
+
+        newLine[j - 1] = null;
+        j--;
+        continue;
       }
-    } else {
-      newLine[j] = line[i];
-      j++;
+
+      // CAS 2 : FUSION MÊME SIGNE (ex: -2 + -2 = -4, ou 4 + 4 = 8)
+      if (prevTile.value === currentTile.value) {
+        const mergeValue = prevTile.value * 2;
+        prevTile.value = mergeValue;
+        prevTile.merged = true;
+
+        if (mergeValue < 0) {
+          // Fusion de deux négatifs : le joueur élimine deux tuiles négatives pour en créer une plus grande
+          // On crédite la valeur absolue de la tuile éliminée
+          updateScore(Math.abs(prevTile.value));
+        } else {
+          // Fusion classique de deux positifs
+          updateScore(mergeValue);
+        }
+
+        playSound("merge");
+
+        const targetIdx = indices[j - 1];
+        const targetX = targetIdx % GRID_SIZE;
+        const targetY = Math.floor(targetIdx / GRID_SIZE);
+
+        if (currentTile.element) {
+          currentTile.element.style.setProperty("--x", targetX);
+          currentTile.element.style.setProperty("--y", targetY);
+          currentTile.element.style.zIndex = "1";
+          setTimeout(() => currentTile.element.remove(), 200);
+        }
+        continue;
+      }
     }
+
+    newLine[j] = currentTile;
+    j++;
   }
+
   return newLine;
+}
+
+// Nouvelle fonction : Secousse de la grille
+function triggerBoardShake() {
+  const board =
+    document.querySelector(".grid-container") ||
+    document.querySelector("#board") ||
+    wrapper;
+  if (!board) return;
+  board.classList.remove("shake-effect");
+  void board.offsetWidth; // Reclic d'animation
+  board.classList.add("shake-effect");
+}
+
+// Nouvelle fonction : Onde de choc qui modifie les voisins
+function triggerShockwave(centerX, centerY) {
+  const neighbors = [
+    { x: centerX + 1, y: centerY },
+    { x: centerX - 1, y: centerY },
+    { x: centerX, y: centerY + 1 },
+    { x: centerX, y: centerY - 1 },
+  ];
+
+  neighbors.forEach((pos) => {
+    if (pos.x >= 0 && pos.x < GRID_SIZE && pos.y >= 0 && pos.y < GRID_SIZE) {
+      const idx = pos.y * GRID_SIZE + pos.x;
+      const neighborTile = grid[idx];
+
+      if (neighborTile) {
+        // Multiplie la valeur du voisin par 2 grâce à l'énergie de l'onde !
+        neighborTile.value = neighborTile.value * 2;
+
+        if (neighborTile.element) {
+          neighborTile.element.classList.remove("animate-shock");
+          void neighborTile.element.offsetWidth;
+          neighborTile.element.classList.add("animate-shock");
+        }
+      }
+    }
+  });
+
+  // Mise à jour visuelle après l'onde
+  setTimeout(() => {
+    updateView();
+  }, 150);
 }
 
 let movingTimeout = null;
@@ -284,7 +405,8 @@ function move(direction) {
   }
 
   // Vérification si la grille a réellement bougé
-  const hasMoved = oldGrid !== JSON.stringify(grid.map((t) => (t ? t.value : null)));
+  const hasMoved =
+    oldGrid !== JSON.stringify(grid.map((t) => (t ? t.value : null)));
 
   if (hasMoved) {
     // MOUVEMENT VALIDE
@@ -293,7 +415,7 @@ function move(direction) {
     updateView();
 
     // Débloque les flèches qui étaient grisées
-    resetBlockedArrows(); 
+    resetBlockedArrows();
 
     grid.forEach((tile) => {
       if (tile?.element) tile.element.classList.add("tile-moving");
@@ -312,18 +434,19 @@ function move(direction) {
       checkGameOver();
       isMoving = false; // <-- Libération du verrou après l'apparition de la tuile
     }, 150);
-
   } else {
     // MOUVEMENT IMPOSSIBLE
     const directionNames = {
       up: "haut",
       down: "bas",
       left: "gauche",
-      right: "droite"
+      right: "droite",
     };
 
     highlightBlockedArrow(direction);
-    showLiquidGlassToast(`Mouvement vers le ${directionNames[direction] || direction} impossible !`);
+    showLiquidGlassToast(
+      `Mouvement vers le ${directionNames[direction] || direction} impossible !`,
+    );
 
     // Libération immédiate du verrou pour ne pas bloquer les commandes
     isMoving = false;
@@ -507,7 +630,7 @@ function moveAndStartTimer(direction) {
     if (timerInterval === null) {
       startTimer();
       if (currentScore > 0 && moveCount > 0) {
-      restartGame();
+        restartGame();
       }
     }
   } else if (currentMode === "Chrono") {
@@ -728,9 +851,13 @@ function restartGame() {
   // 7. Réinitialisation de l'état visuel de toutes les flèches
   const allArrows = document.querySelectorAll(".btn-arrow");
   allArrows.forEach((btn) => {
-    btn.classList.remove("arrow-disabled", "arrow-blocked", "arrow-gameover-blink");
+    btn.classList.remove(
+      "arrow-disabled",
+      "arrow-blocked",
+      "arrow-gameover-blink",
+    );
   });
-  
+
   // Vider le Set des directions bloquées
   blockedDirections.clear();
 
@@ -1115,6 +1242,7 @@ function toggleTotaldisplay() {
 
 // --- Négatifs ---
 
+function toggleNegatifsMode() {}
 function changeGoal() {
   const goalValue = document.getElementById("value-goal");
   let currentGoal = goalValue.textContent;
@@ -1202,7 +1330,7 @@ function closeHowToPlay() {
   const modal = document.getElementById("how-to-play-modal");
   if (modal) {
     modal.classList.remove("visible");
-    
+
     // Sauvegarde de l'état de la checkbox
     const disableCheckbox = document.getElementById("disable-startup-modal");
     if (disableCheckbox) {
@@ -1215,72 +1343,78 @@ function closeHowToPlay() {
 document.addEventListener("DOMContentLoaded", () => {
   const hideAtStartup = localStorage.getItem("hideHowToPlayStartup") === "true";
   const disableCheckbox = document.getElementById("disable-startup-modal");
-  const checkAudio = new Audio('Assets/Sounds/check.mp3');
+  const checkAudio = new Audio("Assets/Sounds/check.mp3");
 
   if (disableCheckbox) {
     disableCheckbox.checked = hideAtStartup;
-    
+
     // Applique directement l'état visuel au chargement si coché
     if (hideAtStartup) {
-      const taskItem = disableCheckbox.closest('.task-item');
+      const taskItem = disableCheckbox.closest(".task-item");
       if (taskItem) {
-        taskItem.classList.add('done');
-        taskItem.style.setProperty('--text-line-scale', '1');
+        taskItem.classList.add("done");
+        taskItem.style.setProperty("--text-line-scale", "1");
       }
     }
 
     // Animation au clic / changement d'état
-    disableCheckbox.addEventListener('change', e => {
-      const task = e.target.closest('.task-item');
-      const checkbox = task.querySelector('.checkbox');
+    disableCheckbox.addEventListener("change", (e) => {
+      const task = e.target.closest(".task-item");
+      const checkbox = task.querySelector(".checkbox");
 
       if (e.target.checked) {
         // Joue le son s'il existe
         checkAudio.play().catch(() => {});
 
-        checkbox.animate([
-          { offsetPath: 'none', '--checkbox-lines-offset': '13.5px' },
-          { '--checkbox-lines-offset': '4.5px' }
-        ], {
-          duration: 200,
-          delay: 200,
-          fill: 'forwards'
-        });
+        checkbox.animate(
+          [
+            { offsetPath: "none", "--checkbox-lines-offset": "13.5px" },
+            { "--checkbox-lines-offset": "4.5px" },
+          ],
+          {
+            duration: 200,
+            delay: 200,
+            fill: "forwards",
+          },
+        );
 
-        const textAnimation = task.animate([
-          { '--text-line-scale': 0, '--text-x': '0px', offset: 0 },
-          { '--text-line-scale': 1, '--text-x': '2px', offset: 0.5 },
-          { '--text-line-scale': 1, '--text-x': '0px', offset: 1 }
-        ], {
-          duration: 300,
-          fill: 'forwards'
-        });
+        const textAnimation = task.animate(
+          [
+            { "--text-line-scale": 0, "--text-x": "0px", offset: 0 },
+            { "--text-line-scale": 1, "--text-x": "2px", offset: 0.5 },
+            { "--text-line-scale": 1, "--text-x": "0px", offset: 1 },
+          ],
+          {
+            duration: 300,
+            fill: "forwards",
+          },
+        );
 
         textAnimation.onfinish = () => {
-          task.style.setProperty('--text-line-scale', '1');
-          task.style.setProperty('--text-x', '0px');
-          task.classList.add('done');
+          task.style.setProperty("--text-line-scale", "1");
+          task.style.setProperty("--text-x", "0px");
+          task.classList.add("done");
         };
 
         return;
       }
 
       // Décocher
-      const reverseAnimation = task.animate([
-        { '--text-line-scale': 1 },
-        { '--text-line-scale': 0 }
-      ], {
-        duration: 250,
-        fill: 'forwards'
-      });
+      const reverseAnimation = task.animate(
+        [{ "--text-line-scale": 1 }, { "--text-line-scale": 0 }],
+        {
+          duration: 250,
+          fill: "forwards",
+        },
+      );
 
       reverseAnimation.onfinish = () => {
-        task.style.setProperty('--text-line-scale', '0');
-        task.classList.remove('done');
+        task.style.setProperty("--text-line-scale", "0");
+        task.classList.remove("done");
       };
     });
   }
-  
+
   if (!hideAtStartup) {
     setTimeout(() => {
       showHowToPlay();
@@ -1296,10 +1430,10 @@ function triggerRestartAnimation() {
 
   // Retire la classe pour stopper l'état précédent si elle y est encore
   iconRestart.classList.remove("is-spinning");
-  
+
   // Force un reflow du navigateur (astuce pour réinitialiser l'animation CSS)
   void iconRestart.offsetWidth;
-  
+
   // Ajoute la classe qui déclenche l'animation de rotation complète
   iconRestart.classList.add("is-spinning");
 
@@ -1314,78 +1448,77 @@ function triggerRestartAnimation() {
 
 // modals footer
 
-const modalTriggers = document.querySelectorAll('[data-open-modal]');
-    const modalOverlays = document.querySelectorAll('.glass-modal-overlay');
+const modalTriggers = document.querySelectorAll("[data-open-modal]");
+const modalOverlays = document.querySelectorAll(".glass-modal-overlay");
 
-    modalTriggers.forEach((trigger) => {
-      trigger.addEventListener('click', () => {
-        const targetId = trigger.getAttribute('data-open-modal');
-        const targetModal = document.getElementById(targetId);
-        if (targetModal) {
-          targetModal.classList.add('active');
-        }
-      });
-    });
+modalTriggers.forEach((trigger) => {
+  trigger.addEventListener("click", () => {
+    const targetId = trigger.getAttribute("data-open-modal");
+    const targetModal = document.getElementById(targetId);
+    if (targetModal) {
+      targetModal.classList.add("active");
+    }
+  });
+});
 
-    document.querySelectorAll('.glass-modal-close').forEach((button) => {
-      button.addEventListener('click', () => {
-        button.closest('.glass-modal-overlay')?.classList.remove('active');
-      });
-    });
+document.querySelectorAll(".glass-modal-close").forEach((button) => {
+  button.addEventListener("click", () => {
+    button.closest(".glass-modal-overlay")?.classList.remove("active");
+  });
+});
 
-    modalOverlays.forEach((overlay) => {
-      overlay.addEventListener('click', (event) => {
-        if (event.target === overlay) {
-          overlay.classList.remove('active');
-        }
-      });
-    });
+modalOverlays.forEach((overlay) => {
+  overlay.addEventListener("click", (event) => {
+    if (event.target === overlay) {
+      overlay.classList.remove("active");
+    }
+  });
+});
 
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') {
-        modalOverlays.forEach((overlay) => overlay.classList.remove('active'));
-      }
-    });
-
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    modalOverlays.forEach((overlay) => overlay.classList.remove("active"));
+  }
+});
 
 //modals
 
-const footerModalTriggers = document.querySelectorAll('[data-open-modal]');
-    const footerModals = document.querySelectorAll('.glass-modal-overlay');
+const footerModalTriggers = document.querySelectorAll("[data-open-modal]");
+const footerModals = document.querySelectorAll(".glass-modal-overlay");
 
-    footerModalTriggers.forEach((trigger) => {
-      trigger.addEventListener('click', () => {
-        const targetId = trigger.getAttribute('data-open-modal');
-        const targetModal = document.getElementById(targetId);
-        if (!targetModal) return;
+footerModalTriggers.forEach((trigger) => {
+  trigger.addEventListener("click", () => {
+    const targetId = trigger.getAttribute("data-open-modal");
+    const targetModal = document.getElementById(targetId);
+    if (!targetModal) return;
 
-        footerModals.forEach((modal) => {
-          modal.classList.remove('active');
-        });
-
-        targetModal.classList.add('active');
-      });
+    footerModals.forEach((modal) => {
+      modal.classList.remove("active");
     });
 
-    document.querySelectorAll('.glass-modal-close').forEach((button) => {
-      button.addEventListener('click', () => {
-        button.closest('.glass-modal-overlay')?.classList.remove('active');
-      });
-    });
+    targetModal.classList.add("active");
+  });
+});
 
-    footerModals.forEach((overlay) => {
-      overlay.addEventListener('click', (event) => {
-        if (event.target === overlay) {
-          overlay.classList.remove('active');
-        }
-      });
-    });
+document.querySelectorAll(".glass-modal-close").forEach((button) => {
+  button.addEventListener("click", () => {
+    button.closest(".glass-modal-overlay")?.classList.remove("active");
+  });
+});
 
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') {
-        footerModals.forEach((overlay) => overlay.classList.remove('active'));
-      }
-    });
+footerModals.forEach((overlay) => {
+  overlay.addEventListener("click", (event) => {
+    if (event.target === overlay) {
+      overlay.classList.remove("active");
+    }
+  });
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    footerModals.forEach((overlay) => overlay.classList.remove("active"));
+  }
+});
 
 // Initialisation du jeu complet
 initBackground();

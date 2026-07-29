@@ -30,7 +30,13 @@ body {
   align-items: center;
   justify-content: center;
   padding: 10px 20px;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
   font-size: 0.875rem;
   font-weight: 500;
   letter-spacing: 0.3px;
@@ -46,7 +52,7 @@ body {
   border-top: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 14px;
 
-  box-shadow: 
+  box-shadow:
     0 4px 20px 0 rgba(0, 0, 0, 0.15),
     inset 0 0 10px 0 rgba(255, 255, 255, 0.05);
 
@@ -64,7 +70,7 @@ body {
 }
 
 .btn-how-to-play::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -50%;
   left: -50%;
@@ -77,7 +83,9 @@ body {
   );
   opacity: 0;
   transform: scale(0.5);
-  transition: opacity 0.4s ease, transform 0.4s ease;
+  transition:
+    opacity 0.4s ease,
+    transform 0.4s ease;
   z-index: 1;
 }
 
@@ -87,7 +95,7 @@ body {
   border-color: rgba(255, 255, 255, 0.28);
   border-top-color: rgba(255, 255, 255, 0.5);
   transform: translateY(-2px);
-  box-shadow: 
+  box-shadow:
     0 8px 25px 0 rgba(0, 180, 216, 0.2),
     inset 0 0 14px 0 rgba(72, 202, 228, 0.25);
 }
@@ -99,7 +107,7 @@ body {
 
 .btn-how-to-play:active {
   transform: translateY(1px) scale(0.97);
-  box-shadow: 
+  box-shadow:
     0 2px 10px 0 rgba(0, 0, 0, 0.15),
     inset 0 0 6px 0 rgba(255, 255, 255, 0.1);
 }
@@ -420,7 +428,11 @@ body {
   text-transform: uppercase;
   cursor: pointer;
   font-family: "Bungee", sans-serif;
-  transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .footer-pill:hover,
@@ -489,8 +501,14 @@ body {
   padding: 22px 24px;
   border-radius: 22px;
   border: 1px solid rgba(255, 255, 255, 0.16);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.04));
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.09),
+    rgba(255, 255, 255, 0.04)
+  );
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
   color: #fff;
   transform: translateY(8px) scale(0.98);
   transition: transform 0.24s ease;
@@ -545,7 +563,9 @@ body {
   text-transform: uppercase;
   cursor: pointer;
   font-family: "Bungee", sans-serif;
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
   text-decoration: none;
 }
 
@@ -672,7 +692,7 @@ main {
   right: 0;
   bottom: 0;
   background-color: rgb(141, 141, 141);
-  transition: .4s;
+  transition: 0.4s;
   border-radius: 10px;
 }
 
@@ -686,11 +706,11 @@ main {
   bottom: 0.3em;
   transform: rotate(270deg);
   background-color: rgb(255, 255, 255);
-  transition: .4s;
+  transition: 0.4s;
 }
 
 .switch input:checked + .slider {
-  background-color: #2196F3;
+  background-color: #2196f3;
   box-shadow: 0 0 6px rgba(33, 150, 243, 0.6);
 }
 
@@ -900,8 +920,189 @@ main {
   box-shadow: 0 0 32px #039be5;
 }
 .tile-65536:hover {
-  box-shadow: 0 0 32px #00d4ff, 0 0 64px #039be5;
+  box-shadow:
+    0 0 32px #00d4ff,
+    0 0 64px #039be5;
   transition: box-shadow 0.6s ease;
+}
+
+/* --- STYLES DES TUILES NÉGATIVES (DE -2 À -2048) --- */
+
+.tile-neg {
+  color: #ffffff;
+  border: 2px solid rgba(255, 23, 68, 0.6);
+  font-weight: bold;
+}
+
+.tile-neg-2 {
+  background-color: #ff7961;
+  box-shadow: 0 0 10px rgba(255, 121, 97, 0.4);
+}
+
+.tile-neg-4 {
+  background-color: #ff5252;
+  box-shadow: 0 0 12px rgba(255, 82, 82, 0.5);
+}
+
+.tile-neg-8 {
+  background-color: #f44336;
+  box-shadow: 0 0 14px rgba(244, 67, 54, 0.6);
+}
+
+.tile-neg-16 {
+  background-color: #e53935;
+  box-shadow: 0 0 16px rgba(229, 57, 53, 0.7);
+}
+
+.tile-neg-32 {
+  background-color: #d32f2f;
+  box-shadow: 0 0 18px rgba(211, 47, 47, 0.8);
+}
+
+.tile-neg-64 {
+  background-color: #c62828;
+  box-shadow: 0 0 20px rgba(198, 40, 40, 0.9);
+}
+
+.tile-neg-128 {
+  background-color: #b71c1c;
+  box-shadow: 0 0 22px rgba(183, 28, 28, 0.9);
+  font-size: 0.9em;
+}
+
+.tile-neg-256 {
+  background-color: #880e4f;
+  box-shadow: 0 0 24px rgba(136, 14, 79, 0.9);
+  font-size: 0.85em;
+}
+
+.tile-neg-512 {
+  background-color: #4a148c;
+  border-color: #7b1fa2;
+  box-shadow: 0 0 26px rgba(123, 31, 162, 0.9);
+  font-size: 0.8em;
+}
+
+.tile-neg-1024 {
+  background-color: #311b92;
+  border-color: #512da8;
+  box-shadow: 0 0 28px rgba(81, 45, 168, 1);
+  font-size: 0.75em;
+}
+
+.tile-neg-2048 {
+  background: linear-gradient(135deg, #1a237e 0%, #b71c1c 100%);
+  border: 2px solid #ff1744;
+  box-shadow: 0 0 32px rgba(255, 23, 68, 1);
+  font-size: 0.7em;
+  animation: negPulse 1.5s infinite alternate;
+}
+
+@keyframes negPulse {
+  0% {
+    box-shadow: 0 0 20px rgba(255, 23, 68, 0.8);
+  }
+  100% {
+    box-shadow:
+      0 0 35px rgba(255, 23, 68, 1),
+      0 0 15px rgba(255, 255, 255, 0.6);
+  }
+}
+
+.tile-neg:hover {
+  box-shadow: 0 0 18px rgba(255, 82, 82, 0.8);
+  transition: box-shadow 0.4s ease;
+}
+
+/* --- ANIMATION D'ANNULATION DES TUILES NÉGATIVES/POSITIVES --- */
+@keyframes cancelTile {
+  0% {
+    transform: translate(
+        calc(var(--x) * (var(--tile-size) + var(--grid-gap))),
+        calc(var(--y) * (var(--tile-size) + var(--grid-gap)))
+      )
+      scale(1);
+    filter: brightness(1.5) drop-shadow(0 0 10px #ff1744);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(
+        calc(var(--x) * (var(--tile-size) + var(--grid-gap))),
+        calc(var(--y) * (var(--tile-size) + var(--grid-gap)))
+      )
+      scale(1.15);
+    filter: brightness(2) drop-shadow(0 0 20px #ff1744);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(
+        calc(var(--x) * (var(--tile-size) + var(--grid-gap))),
+        calc(var(--y) * (var(--tile-size) + var(--grid-gap)))
+      )
+      scale(0);
+    opacity: 0;
+  }
+}
+
+.tile.animate-cancel {
+  animation: cancelTile 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  pointer-events: none;
+  z-index: 10 !important;
+}
+
+/* --- EFFET SHAKE / SECOUSSE DE LA GRILLE --- */
+.shake-effect {
+  animation: shake 0.25s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes shake {
+  10%,
+  90% {
+    transform: translate3d(-2px, 0, 0);
+  }
+  20%,
+  80% {
+    transform: translate3d(3px, 0, 0);
+  }
+  30%,
+  50%,
+  70% {
+    transform: translate3d(-5px, 0, 0);
+  }
+  40%,
+  60% {
+    transform: translate3d(5px, 0, 0);
+  }
+}
+
+/* --- ANIMATION ONDE DE CHOC SUR LES TUILES ADJACENTES --- */
+.tile.animate-shock {
+  animation: shockPulse 0.3s ease-out;
+}
+
+@keyframes shockPulse {
+  0% {
+    transform: translate(
+        calc(var(--x) * (var(--tile-size) + var(--grid-gap))),
+        calc(var(--y) * (var(--tile-size) + var(--grid-gap)))
+      )
+      scale(1);
+  }
+  50% {
+    transform: translate(
+        calc(var(--x) * (var(--tile-size) + var(--grid-gap))),
+        calc(var(--y) * (var(--tile-size) + var(--grid-gap)))
+      )
+      scale(1.18);
+    filter: brightness(1.6) drop-shadow(0 0 12px #ff1744);
+  }
+  100% {
+    transform: translate(
+        calc(var(--x) * (var(--tile-size) + var(--grid-gap))),
+        calc(var(--y) * (var(--tile-size) + var(--grid-gap)))
+      )
+      scale(1);
+  }
 }
 
 /* ── TILE ANIMATIONS ── */
@@ -974,7 +1175,10 @@ main {
   filter: brightness(1.2) saturate(1.3) !important;
   z-index: 20 !important;
   transform: scale(1.06) !important;
-  transition: outline 0.8s ease-out, transform 0.8s ease-out, filter 0.8s ease-out !important;
+  transition:
+    outline 0.8s ease-out,
+    transform 0.8s ease-out,
+    filter 0.8s ease-out !important;
 }
 .visuel-dim {
   filter: brightness(0.4) saturate(0.3) !important;
@@ -1520,7 +1724,7 @@ body.dev-active .tile:hover {
   animation: fadeIn 0.4s forwards;
 }
 
-#time-chronoMode{
+#time-chronoMode {
   display: none;
   font-size: 38px;
   color: rgba(255, 255, 255, 0.8);
@@ -1531,9 +1735,18 @@ body.dev-active .tile:hover {
 }
 
 @keyframes chrono-blink {
-  0% { color: white; transform: scale(1); }
-  50% { color: #ff4d4d; transform: scale(1.1); }
-  100% { color: white; transform: scale(1); }
+  0% {
+    color: white;
+    transform: scale(1);
+  }
+  50% {
+    color: #ff4d4d;
+    transform: scale(1.1);
+  }
+  100% {
+    color: white;
+    transform: scale(1);
+  }
 }
 
 .chrono-warning {
@@ -1548,13 +1761,13 @@ body.dev-active .tile:hover {
   top: 24px;
   left: 50%;
   z-index: 1000;
-  
+
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 12px 24px;
   border-radius: 20px;
-  
+
   font-family: "Bungee", sans-serif;
   font-size: 14px;
   color: #ffffff;
@@ -1564,11 +1777,11 @@ body.dev-active .tile:hover {
   background: rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
-  
+
   /* Contour cristal effet verre */
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-top: 1px solid rgba(255, 255, 255, 0.6);
-  
+
   box-shadow:
     0 10px 30px rgba(0, 0, 0, 0.25),
     inset 0 1px 2px rgba(255, 255, 255, 0.6),
@@ -1579,9 +1792,9 @@ body.dev-active .tile:hover {
   /* ÉTAT INITIAL / SORTIE : Reculée au fond (scale 0.75) + invisible */
   opacity: 0;
   transform: translate(-50%, 0) scale(0.75);
-  
+
   /* Transition continue et ultra-smooth sans changement de courbe */
-  transition: 
+  transition:
     opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
     transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -1615,10 +1828,23 @@ body.dev-active .tile:hover {
 }
 
 @keyframes toast-shake {
-  10%, 90% { transform: translate(calc(-50% - 4px), 0) scale(1); }
-  20%, 80% { transform: translate(calc(-50% + 6px), 0) scale(1); }
-  30%, 50%, 70% { transform: translate(calc(-50% - 8px), 0) scale(1); }
-  40%, 60% { transform: translate(calc(-50% + 8px), 0) scale(1); }
+  10%,
+  90% {
+    transform: translate(calc(-50% - 4px), 0) scale(1);
+  }
+  20%,
+  80% {
+    transform: translate(calc(-50% + 6px), 0) scale(1);
+  }
+  30%,
+  50%,
+  70% {
+    transform: translate(calc(-50% - 8px), 0) scale(1);
+  }
+  40%,
+  60% {
+    transform: translate(calc(-50% + 8px), 0) scale(1);
+  }
 }
 
 /* ── EFFET ROUGE SUR LES FLÈCHES ── */
@@ -1629,10 +1855,18 @@ body.dev-active .tile:hover {
 }
 
 @keyframes arrow-headshake {
-  0% { transform: scale(1); }
-  30% { transform: scale(0.92); }
-  60% { transform: scale(1.05); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  30% {
+    transform: scale(0.92);
+  }
+  60% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* ── ANIMATION GAME OVER (2 CLIGNOTEMENTS ROUGES) ── */
@@ -1641,7 +1875,8 @@ body.dev-active .tile:hover {
 }
 
 @keyframes arrow-blink-red {
-  0%, 100% {
+  0%,
+  100% {
     --btn-bg: #0288d1;
     --btn-shadow: #01579b;
   }
@@ -1696,27 +1931,27 @@ body.dev-active .tile:hover {
   max-height: 85vh;
   display: flex;
   flex-direction: column;
-  
+
   background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
-  
+
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-top: 1px solid rgba(255, 255, 255, 0.45);
   border-left: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 24px;
-  
-  box-shadow: 
+
+  box-shadow:
     0 30px 60px rgba(0, 0, 0, 0.4),
     inset 0 1px 1px rgba(255, 255, 255, 0.4);
-    
+
   color: white;
   transform: translateY(30px) scale(0.95);
   transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-  
+
   /* INDISPENSABLE pour empêcher le dépassement horizontal */
   box-sizing: border-box;
-  overflow-x: hidden; 
+  overflow-x: hidden;
   overflow-y: hidden; /* Géré par .modal-body */
 }
 
@@ -1769,7 +2004,8 @@ body.dev-active .tile:hover {
   padding: 20px 25px;
   overflow-y: auto;
   overflow-x: hidden; /* Bloque tout défilement vers la gauche ou la droite */
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   line-height: 1.6;
   box-sizing: border-box;
 }
@@ -1799,7 +2035,8 @@ body.dev-active .tile:hover {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-.modal-section p, .modal-section li {
+.modal-section p,
+.modal-section li {
   font-size: 14px;
   color: rgba(255, 255, 255, 0.85);
   margin-bottom: 8px;
@@ -1906,7 +2143,7 @@ body.dev-active .tile:hover {
   padding: 4px 12px;
   mask-image: -webkit-radial-gradient(white, black);
   -webkit-mask-image: -webkit-radial-gradient(white, black);
-  transition: background .15s linear;
+  transition: background 0.15s linear;
 }
 
 .task-item:not(.done):hover {
@@ -1916,7 +2153,7 @@ body.dev-active .tile:hover {
 }
 
 .task-item:before {
-  content: '';
+  content: "";
   position: absolute;
   width: 32px;
   height: 6px;
@@ -1926,7 +2163,9 @@ body.dev-active .tile:hover {
   box-shadow: 0px 4px 4px var(--checkbox-active);
   transform: translateX(var(--blur-x, 0));
   opacity: var(--blur-o, 0);
-  transition: opacity .15s, transform 1.2s;
+  transition:
+    opacity 0.15s,
+    transform 1.2s;
 }
 
 .task-item.done {
@@ -1937,20 +2176,23 @@ body.dev-active .tile:hover {
 
 .task-item .text {
   display: block;
-  letter-spacing: -.05px;
+  letter-spacing: -0.05px;
   text-decoration: none;
   color: var(--text-color);
   position: relative;
-  font-family: 'Inter', -apple-system, sans-serif;
+  font-family:
+    "Inter",
+    -apple-system,
+    sans-serif;
   font-size: 0.9rem;
   font-weight: 500;
   transform: translateX(var(--text-x)) translateZ(0);
-  transition: color .25s;
+  transition: color 0.25s;
   user-select: none;
 }
 
 .task-item .text:before {
-  content: '';
+  content: "";
   position: absolute;
   height: 1px;
   left: -2px;
@@ -1959,7 +2201,7 @@ body.dev-active .tile:hover {
   transform-origin: 0 50%;
   transform: translateY(-50%) scaleX(var(--text-line-scale)) translateZ(0);
   background: currentColor;
-  transition: transform .25s ease;
+  transition: transform 0.25s ease;
 }
 
 .task-item .checkbox {
@@ -1997,20 +2239,23 @@ body.dev-active .tile:hover {
   left: 0px;
   top: 10px;
   color: var(--checkbox-active);
-  transition: color .25s linear;
+  transition: color 0.25s linear;
 }
 
 .task-item .checkbox input + svg .shape {
   stroke-width: 1.5px;
   stroke: var(--border, var(--border-default));
   fill: var(--background, none);
-  transition: fill .25s linear, stroke .25s linear;
+  transition:
+    fill 0.25s linear,
+    stroke 0.25s linear;
 }
 
 .task-item .checkbox input + svg .tick {
   stroke-dasharray: 20;
   stroke-dashoffset: var(--checkbox-tick-offset, 20px);
-  transition: stroke-dashoffset var(--checkbox-tick-duration, .15s) var(--checkbox-tick-easing, ease);
+  transition: stroke-dashoffset var(--checkbox-tick-duration, 0.15s)
+    var(--checkbox-tick-easing, ease);
 }
 
 .task-item .checkbox input + svg .tick.mask {
@@ -2034,8 +2279,8 @@ body.dev-active .tile:hover {
 .task-item .checkbox input:checked + svg {
   --background: var(--checkbox-active);
   --border: var(--checkbox-active);
-  --checkbox-tick-duration: .2s;
-  --checkbox-tick-easing: cubic-bezier(0, .45, 1, .5);
+  --checkbox-tick-duration: 0.2s;
+  --checkbox-tick-easing: cubic-bezier(0, 0.45, 1, 0.5);
   --checkbox-tick-offset: 0;
 }
 
