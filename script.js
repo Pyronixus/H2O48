@@ -366,6 +366,7 @@ function move(direction) {
   // 1. Si un mouvement est déjà en cours d'animation ou qu'un overlay est présent, on ignore
   if (
     isMoving ||
+    isFlashing ||
     document.getElementById("win-overlay") ||
     document.getElementById("game-over-overlay")
   ) {
@@ -415,8 +416,13 @@ function move(direction) {
   if (hasMoved) {
     // MOUVEMENT VALIDE
     moveCount++;
+    hasMovedSinceLastFlash = true; // Pour le mode invisible
     playSound("move");
     updateView();
+    // Déclenche le flash au mouvement si on est en mode Invisible ou Hard
+    if (currentMode === "Invisible" || currentMode === "Hard") {
+      flashTilesOnMove();
+    }
 
     // Débloque les flèches qui étaient grisées
     resetBlockedArrows();
@@ -737,10 +743,9 @@ function triggerGameOver() {
 
   playSound("gameOver");
   stopTimer();
+  // Modes gravité et invisible
   stopGravityTimer();
-  if (currentMode === "Gravité" || currentMode === "Hard") {
-    startGravityTimer();
-  }
+  stopInvisibleMode();
   stopChronoTime();
 
   // 1. Clignotement rouge sur toutes les flèches
@@ -844,9 +849,13 @@ function restartGame() {
   stopTimer();
   timeMin = 0;
   timeSec = 0;
+  // Modes gravité et invisible
   stopGravityTimer();
   if (currentMode === "Gravité" || currentMode === "Hard") {
     startGravityTimer();
+  }
+  if (currentMode === "Invisible" || currentMode === "Hard") {
+    startInvisibleMode();
   }
   updateTimerDisplay();
 
@@ -1208,6 +1217,13 @@ function changeMode() {
       );
     }
   }
+
+  // Gestion du mode invisible
+  if (currentMode === "Invisible" || currentMode === "Hard") {
+    startInvisibleMode();
+  } else {
+    stopInvisibleMode();
+  }
 }
 
 const chronoTime = document.getElementById("time-chronoMode");
@@ -1282,7 +1298,6 @@ function toggleTotaldisplay() {
 
 // --- Négatifs ---
 
-function toggleNegatifsMode() {}
 function changeGoal() {
   const goalValue = document.getElementById("value-goal");
   let currentGoal = goalValue.textContent;
@@ -1369,6 +1384,48 @@ function updateGravityUI() {
     modeDisplay.textContent = `Gravité (${arrows[gravityDirection]} ${gravityTimerSec}s)`;
   }
 }
+// --- Invisible ---
+let invisibleTimeout = null;
+let isFlashing = false; // Bloque les actions pendant le flash
+
+function startInvisibleMode() {
+  stopInvisibleMode();
+  const gameWrapper = document.getElementById("game");
+  if (gameWrapper) {
+    gameWrapper.classList.add("mode-invisible");
+  }
+}
+
+function stopInvisibleMode() {
+  isFlashing = false; // Réinitialise le blocage
+  if (invisibleTimeout !== null) {
+    clearTimeout(invisibleTimeout);
+    invisibleTimeout = null;
+  }
+  const gameWrapper = document.getElementById("game");
+  if (gameWrapper) {
+    gameWrapper.classList.remove("mode-invisible", "reveal");
+  }
+}
+
+function flashTilesOnMove() {
+  const gameWrapper = document.getElementById("game");
+  if (!gameWrapper) return;
+
+  if (invisibleTimeout !== null) {
+    clearTimeout(invisibleTimeout);
+  }
+
+  isFlashing = true; // Empêche de jouer
+  gameWrapper.classList.add("reveal");
+
+  invisibleTimeout = setTimeout(() => {
+    gameWrapper.classList.remove("reveal");
+    isFlashing = false; // Débloque le jeu une fois l'animation finie
+  }, 700);
+}
+
+//  Reste...
 
 function loadGoalValue() {
   const savedGoal = localStorage.getItem("goalValue");
@@ -1586,45 +1643,6 @@ modalOverlays.forEach((overlay) => {
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
     modalOverlays.forEach((overlay) => overlay.classList.remove("active"));
-  }
-});
-
-//modals
-
-const footerModalTriggers = document.querySelectorAll("[data-open-modal]");
-const footerModals = document.querySelectorAll(".glass-modal-overlay");
-
-footerModalTriggers.forEach((trigger) => {
-  trigger.addEventListener("click", () => {
-    const targetId = trigger.getAttribute("data-open-modal");
-    const targetModal = document.getElementById(targetId);
-    if (!targetModal) return;
-
-    footerModals.forEach((modal) => {
-      modal.classList.remove("active");
-    });
-
-    targetModal.classList.add("active");
-  });
-});
-
-document.querySelectorAll(".glass-modal-close").forEach((button) => {
-  button.addEventListener("click", () => {
-    button.closest(".glass-modal-overlay")?.classList.remove("active");
-  });
-});
-
-footerModals.forEach((overlay) => {
-  overlay.addEventListener("click", (event) => {
-    if (event.target === overlay) {
-      overlay.classList.remove("active");
-    }
-  });
-});
-
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") {
-    footerModals.forEach((overlay) => overlay.classList.remove("active"));
   }
 });
 
