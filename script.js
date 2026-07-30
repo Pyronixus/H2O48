@@ -8,6 +8,10 @@ let goalReached = false;
 let chronoInterval = null;
 let totalPlayTime = 0;
 let last300Points = 0; // Pour suivre les paliers de 300 points
+// --- MODE GRAVITÉ ---
+let gravityDirection = "down"; // Directions possibles : 'down', 'left', 'up', 'right'
+let gravityInterval = null;
+let gravityTimerSec = 60;
 
 const TILE_DATA = [
   { value: 2, bg: "#e0f7fa", shadow: "#a0d9e2", color: "#555" },
@@ -432,7 +436,15 @@ function move(direction) {
     setTimeout(() => {
       spawnTile();
       checkGameOver();
-      isMoving = false; // <-- Libération du verrou après l'apparition de la tuile
+      isMoving = false;
+
+      // Si la gravité doit faire tomber les pièces après le coup du joueur :
+      if (
+        (currentMode === "Gravité" || currentMode === "Hard") &&
+        direction !== gravityDirection
+      ) {
+        setTimeout(() => applyGravity(), 120);
+      }
     }, 150);
   } else {
     // MOUVEMENT IMPOSSIBLE
@@ -725,6 +737,10 @@ function triggerGameOver() {
 
   playSound("gameOver");
   stopTimer();
+  stopGravityTimer();
+  if (currentMode === "Gravité" || currentMode === "Hard") {
+    startGravityTimer();
+  }
   stopChronoTime();
 
   // 1. Clignotement rouge sur toutes les flèches
@@ -828,6 +844,10 @@ function restartGame() {
   stopTimer();
   timeMin = 0;
   timeSec = 0;
+  stopGravityTimer();
+  if (currentMode === "Gravité" || currentMode === "Hard") {
+    startGravityTimer();
+  }
   updateTimerDisplay();
 
   // 5. Suppression de l'écran de Game Over s'il existe
@@ -1163,13 +1183,33 @@ const MODES = [
   "Hard",
 ];
 let currentMode = MODES[0];
+
 function changeMode() {
   restartGame();
   let index = MODES.indexOf(currentMode);
   currentMode = MODES[(index + 1) % MODES.length];
   document.getElementById("value-mode").textContent = currentMode;
-  toggleChronoTimeDisplay(); // Affiche ou masque le chrono selon le mode
+
+  toggleChronoTimeDisplay(); // Affiche/masque le chrono
+
+  // Gestion du mode gravité
+  if (currentMode === "Gravité" || currentMode === "Hard") {
+    gravityDirection = "down";
+    startGravityTimer();
+  } else {
+    stopGravityTimer();
+    const wrapper = document.getElementById("game");
+    if (wrapper) {
+      wrapper.classList.remove(
+        "gravity-down",
+        "gravity-left",
+        "gravity-up",
+        "gravity-right",
+      );
+    }
+  }
 }
+
 const chronoTime = document.getElementById("time-chronoMode");
 let chronoTimeTotalSec = 0;
 let chronoTimeTotalMin = 0;
@@ -1260,6 +1300,74 @@ function changeGoal() {
   goalValue.textContent = newGoal;
   localStorage.setItem("goalValue", newGoal); // Sauvegarde dans le localStorage
   restartGame();
+}
+
+// --- Gravité ---
+
+function startGravityTimer() {
+  stopGravityTimer();
+  gravityTimerSec = 60;
+  updateGravityUI();
+
+  gravityInterval = setInterval(() => {
+    if (
+      document.getElementById("game-over-overlay") ||
+      document.getElementById("win-overlay")
+    ) {
+      return;
+    }
+
+    gravityTimerSec--;
+    updateGravityUI();
+
+    if (gravityTimerSec <= 0) {
+      rotateGravityDirection();
+      gravityTimerSec = 60;
+    }
+  }, 1000);
+}
+
+function stopGravityTimer() {
+  if (gravityInterval !== null) {
+    clearInterval(gravityInterval);
+    gravityInterval = null;
+  }
+}
+
+function rotateGravityDirection() {
+  const directions = ["down", "left", "up", "right"];
+  const currentIndex = directions.indexOf(gravityDirection);
+  gravityDirection = directions[(currentIndex + 1) % directions.length];
+
+  // Animation visuelle de la grille
+  const wrapper = document.getElementById("game");
+  if (wrapper) {
+    wrapper.classList.remove(
+      "gravity-down",
+      "gravity-left",
+      "gravity-up",
+      "gravity-right",
+    );
+    wrapper.classList.add(`gravity-${gravityDirection}`);
+  }
+
+  // Applique immédiatement la nouvelle gravité
+  applyGravity();
+}
+
+function applyGravity() {
+  if (currentMode !== "Gravité" && currentMode !== "Hard") return;
+
+  // Utilise la fonction move() existante dans la direction de la gravité
+  move(gravityDirection);
+}
+
+function updateGravityUI() {
+  const modeDisplay = document.getElementById("value-mode");
+  if (currentMode === "Gravité" && modeDisplay) {
+    const arrows = { down: "🠇", left: "🠄", up: "🠅", right: "🠆" };
+    modeDisplay.textContent = `Gravité (${arrows[gravityDirection]} ${gravityTimerSec}s)`;
+  }
 }
 
 function loadGoalValue() {
