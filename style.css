@@ -2318,3 +2318,96 @@ body.dev-active .tile:hover {
 #game.mode-invisible.reveal .tile {
   opacity: 1 !important;
 }
+
+/* --- ANIMATION NETTOYAGE ZEN --- */
+@keyframes zenAuraDisintegrate {
+  0% {
+    transform: scale(1);
+    filter: brightness(1) blur(0px);
+    opacity: 1;
+  }
+  30% {
+    transform: scale(1.12);
+    filter: brightness(2) blur(1px) drop-shadow(0 0 15px rgba(116, 192, 252, 0.9));
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(0.4) translateY(-20px);
+    filter: brightness(2.5) blur(8px) drop-shadow(0 0 25px rgba(116, 192, 252, 0));
+    opacity: 0;
+  }
+}
+
+.animate-zen-clean {
+  animation: zenAuraDisintegrate 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+  z-index: 60 !important;
+  pointer-events: none;
+}
+
+/* --- NOTIFICATION COMPACTE EN BAS À DROITE --- */
+.zen-toast-container {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.zen-toast {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(116, 192, 252, 0.4);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3),
+              0 0 12px rgba(116, 192, 252, 0.25),
+              inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  color: #e7f5ff;
+  font-weight: 500;
+  font-size: 0.82rem;
+  padding: 6px 12px;
+  border-radius: 12px;
+  opacity: 0;
+  transform: translateX(30px) scale(0.9);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.zen-toast.show {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+}
+
+.zen-toast-icon {
+  font-size: 0.95rem;
+  filter: drop-shadow(0 0 4px #74c0fc);
+}
+
+/* --- ANIMATION DE CLEAN EFFET "ÉVAPORATION / DISSOLUTION" --- */
+@keyframes zenAuraDisintegrate {
+  0% {
+    transform: scale(1);
+    filter: brightness(1) blur(0px);
+    opacity: 1;
+  }
+  30% {
+    transform: scale(1.12);
+    filter: brightness(2) blur(1px) drop-shadow(0 0 15px rgba(116, 192, 252, 0.9));
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(0.4) translateY(-20px);
+    filter: brightness(2.5) blur(8px) drop-shadow(0 0 25px rgba(116, 192, 252, 0));
+    opacity: 0;
+  }
+}
+
+.animate-zen-clean {
+  animation: zenAuraDisintegrate 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+  z-index: 60 !important;
+  pointer-events: none;
+} 

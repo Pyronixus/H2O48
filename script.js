@@ -4,14 +4,22 @@ const wrapper = document.getElementById("game");
 let grid = Array(GRID_SIZE * GRID_SIZE).fill(null);
 // objectif
 let goalReached = false;
-// mode chrono
+
+// MODES
+
+// chrono
 let chronoInterval = null;
 let totalPlayTime = 0;
 let last300Points = 0; // Pour suivre les paliers de 300 points
-// --- MODE GRAVITÉ ---
+// gravité
 let gravityDirection = "down"; // Directions possibles : 'down', 'left', 'up', 'right'
 let gravityInterval = null;
 let gravityTimerSec = 60;
+// zen
+let zenMergeCount = 0; // Compteur de fusions consécutives
+let zenCleanInterval = null; // Intervalle de nettoyage toutes les 30s
+const ZEN_CLEAN_INTERVAL_SEC = 30;
+let zenTimerSec = ZEN_CLEAN_INTERVAL_SEC;
 
 const TILE_DATA = [
   { value: 2, bg: "#e0f7fa", shadow: "#a0d9e2", color: "#555" },
@@ -732,8 +740,13 @@ function checkGameOver() {
 
   // 3. Si aucune case vide ET aucun mouvement possible : Game Over
   if (!canMove) {
-    stopTimer(); // On arrete le timer peut importe si on a gagné ou pas avant
-    triggerGameOver();
+    if (currentMode === "Zen") {
+      // MODE ZEN : Pas de Game Over ! Libération d'urgence de 2 tuiles gênantes
+      performZenClean(2);
+    } else {
+      stopTimer(); // On arrete le timer peut importe si on a gagné ou pas avant
+      triggerGameOver();
+    }
   }
 }
 
@@ -849,13 +862,17 @@ function restartGame() {
   stopTimer();
   timeMin = 0;
   timeSec = 0;
-  // Modes gravité et invisible
+  // Modes gravité, invisible et zen
   stopGravityTimer();
   if (currentMode === "Gravité" || currentMode === "Hard") {
     startGravityTimer();
   }
   if (currentMode === "Invisible" || currentMode === "Hard") {
     startInvisibleMode();
+  }
+  stopZenTimer();
+  if (currentMode === "Zen") {
+    startZenTimer();
   }
   updateTimerDisplay();
 
@@ -1199,9 +1216,9 @@ function changeMode() {
   currentMode = MODES[(index + 1) % MODES.length];
   document.getElementById("value-mode").textContent = currentMode;
 
-  toggleChronoTimeDisplay(); // Affiche/masque le chrono
+  toggleChronoTimeDisplay();
 
-  // Gestion du mode gravité
+  // Mode Gravité
   if (currentMode === "Gravité" || currentMode === "Hard") {
     gravityDirection = "down";
     startGravityTimer();
@@ -1218,11 +1235,18 @@ function changeMode() {
     }
   }
 
-  // Gestion du mode invisible
+  // Mode Invisible
   if (currentMode === "Invisible" || currentMode === "Hard") {
     startInvisibleMode();
   } else {
     stopInvisibleMode();
+  }
+
+  // MODE ZEN : Gestion des timers et événements
+  if (currentMode === "Zen") {
+    startZenTimer();
+  } else {
+    stopZenTimer();
   }
 }
 
@@ -1423,6 +1447,183 @@ function flashTilesOnMove() {
     gameWrapper.classList.remove("reveal");
     isFlashing = false; // Débloque le jeu une fois l'animation finie
   }, 700);
+}
+
+// --- Zen ---
+function performZenClean(count = 1) {
+  let tilesWithScores = [];
+
+  // 1. Calcul du score de gêne/nuisance pour chaque tuile présente
+  grid.forEach((tile, index) => {
+    if (!tile) return;
+
+    // Protection : Ne jamais supprimer les tuiles de haute valeur (ex: >= 256)
+    if (Math.abs(tile.value) >= 256) return;
+
+    const x = index % GRID_SIZE;
+    const y = Math.floor(index / GRID_SIZE);
+
+    let isolateScore = 0;
+    let hasMatchingNeighbor = false;
+
+    // Inspection des 4 voisins (Haut, Bas, Gauche, Droite)
+    const neighbors = [
+      { x: x + 1, y: y },
+      { x: x - 1, y: y },
+      { x: x, y: y + 1 },
+      { x: x, y: y - 1 },
+    ];
+
+    neighbors.forEach((pos) => {
+      if (pos.x >= 0 && pos.x < GRID_SIZE && pos.y >= 0 && pos.y < GRID_SIZE) {
+        const nIdx = pos.y * GRID_SIZE + pos.x;
+        const neighbor = grid[nIdx];
+        if (neighbor) {
+          if (neighbor.value === tile.value) {
+            hasMatchingNeighbor = true; // Voisin identique = fusion possible
+          } else if (Math.abs(neighbor.value) > Math.abs(tile.value) * 4) {
+            // Écart important de valeur : la petite tuile gêne la grande
+            isolateScore += 15;
+          }
+        }
+      }
+    });
+
+    // Plus la valeur est petite, plus la tuile est candidate au nettoyage
+    let valuePenalty = 100 / Math.abs(tile.value);
+
+    // Si la tuile n'a aucun voisin fusionnable, sa priorité d'élimination augmente
+    let totalNuisance =
+      valuePenalty + isolateScore + (hasMatchingNeighbor ? 0 : 25);
+
+    tilesWithScores.push({ index, tile, score: totalNuisance });
+  });
+
+  // Si aucune tuile n'est éligible au nettoyage
+  if (tilesWithScores.length === 0) return;
+
+  // 2. Tri des tuiles par score de nuisance décroissant
+  tilesWithScores.sort((a, b) => b.score - a.score);
+
+  // 3. Suppression visuelle et logique de la/des tuiles ciblées
+  for (let i = 0; i < Math.min(count, tilesWithScores.length); i++) {
+    const target = tilesWithScores[i];
+    const targetTile = target.tile;
+    const targetIndex = target.index;
+
+    if (targetTile.element) {
+      targetTile.element.classList.add("animate-zen-clean");
+      setTimeout(() => {
+        if (targetTile.element) targetTile.element.remove();
+      }, 500); // 500ms : synchronisé avec l'animation CSS
+    }
+
+    grid[targetIndex] = null;
+  }
+
+  // Feedback sonore et notification compacte en bas à droite
+  playSound("merge");
+  showZenToast("Purification Zen : Tuile parasite dissoute !");
+
+  // Effet visuel discret sur la grille
+  triggerBoardShake();
+
+  // Mise à jour de la grille après la fin de l'animation
+  setTimeout(() => {
+    updateView();
+  }, 500);
+}
+
+function startZenTimer() {
+  stopZenTimer();
+  zenTimerSec = ZEN_CLEAN_INTERVAL_SEC;
+  updateZenUI();
+
+  zenCleanInterval = setInterval(() => {
+    if (
+      document.getElementById("game-over-overlay") ||
+      document.getElementById("win-overlay")
+    )
+      return;
+
+    zenTimerSec--;
+    updateZenUI();
+
+    if (zenTimerSec <= 0) {
+      performZenClean(1); // Nettoie 1 tuile gênante toutes les 30s
+      zenTimerSec = ZEN_CLEAN_INTERVAL_SEC;
+    }
+  }, 1000);
+}
+
+function stopZenTimer() {
+  if (zenCleanInterval !== null) {
+    clearInterval(zenCleanInterval);
+    zenCleanInterval = null;
+  }
+}
+
+function updateZenUI() {
+  const modeDisplay = document.getElementById("value-mode");
+  if (currentMode === "Zen" && modeDisplay) {
+    modeDisplay.textContent = `Zen (✨ ${zenTimerSec}s)`;
+  }
+}
+
+function showZenToast(message) {
+  // On attache la notif au conteneur du jeu s'il existe, sinon au body
+  const gameContainer =
+    document.getElementById("game-container") ||
+    document.getElementById("game") ||
+    document.body;
+
+  let container = document.getElementById("zen-toast-container");
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "zen-toast-container";
+    container.className = "zen-toast-container";
+
+    // Assure un positionnement relatif au conteneur du jeu s'il n'est pas statique
+    if (
+      gameContainer !== document.body &&
+      getComputedStyle(gameContainer).position === "static"
+    ) {
+      gameContainer.style.position = "relative";
+    }
+
+    gameContainer.appendChild(container);
+  }
+
+  const toast = document.createElement("div");
+  toast.className = "zen-toast";
+  toast.innerHTML = `
+    <span class="zen-toast-icon">✨</span>
+    <span>${message}</span>
+  `;
+
+  container.appendChild(toast);
+
+  requestAnimationFrame(() => {
+    toast.classList.add("show");
+  });
+
+  setTimeout(() => {
+    toast.classList.remove("show");
+    setTimeout(() => {
+      if (toast.parentNode) toast.parentNode.removeChild(toast);
+    }, 350);
+  }, 2200);
+}
+
+// Fonction utilitaire si le conteneur n'existe pas encore
+function createToastContainer() {
+  let container = document.getElementById("toast-container");
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "toast-container";
+    document.body.appendChild(container);
+  }
+  return container;
 }
 
 //  Reste...

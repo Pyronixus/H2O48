@@ -42,7 +42,7 @@ Accédez aux options via l'icône **paramètres** pour personnaliser votre expé
 - **Grille** : Modifier la taille de la grille (2x2, 4x4, 5x5, 6x6, etc.).
 - **Objectifs** : Définir la tuile cible pour valider un record.
 - **Réinitialisation** : Remettre à zéro vos records personnels enregistrés dans le navigateur.
-- **_Mode de Jeu_** : Jouez avec des règles différentes dans des modes de jeux épiques : **Normal**, **Chrono**, **Négatifs**, **Gravité**, **Invisible**, **Zen [Bientôt]** et **_Hard_ [Bientôt]** !
+- **_Mode de Jeu_** : Jouez avec des règles différentes dans des modes de jeux épiques : **Normal**, **Chrono**, **Négatifs**, **Gravité**, **Invisible**, **Zen** et **_Hard_ [Bientôt]** !
 
 ---
 
