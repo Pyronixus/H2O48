@@ -40,13 +40,6 @@ const TILE_DATA = [
   { value: 65536, bg: "#000000", shadow: "#00d4ff", color: "#00d4ff" },
 ];
 
-const sounds = {
-  move: new Audio("Assets/Sounds/move.wav"),
-  merge: new Audio("Assets/Sounds/merge.wav"),
-  win: new Audio("Assets/Sounds/win.wav"),
-  gameOver: new Audio("Assets/Sounds/game-over.wav"),
-};
-
 function initBackground() {
   wrapper.innerHTML = "";
   for (let i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
@@ -987,36 +980,158 @@ if (timeCheckbox) {
   timeText.style.display = "none";
 }
 
-// Sound logic
-const soundCheckbox = document.getElementById("toggle-sound"); // Variable globale pour suivre l'état du son
-let isSoundEnabled = document.getElementById("toggle-sound").checked;
+// --- AUDIO SYNTHÉTIQUE (WEB AUDIO API) & SOUND LOGIC ---
+let audioCtx = null;
+
+function getAudioContext() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === "suspended") {
+    audioCtx.resume();
+  }
+  return audioCtx;
+}
+
+// 1. DÉPLACEMENT : Roulis d'eau pur (effet mate)
+function playWaterMove() {
+  const ctx = getAudioContext();
+  const now = ctx.currentTime;
+  const duration = 0.28;
+
+  const bufferSize = ctx.sampleRate * duration;
+  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+
+  for (let i = 0; i < bufferSize; i++) {
+    const white = Math.random() * 2 - 1;
+    b0 = 0.99886 * b0 + white * 0.0555179;
+    b1 = 0.99332 * b1 + white * 0.0750759;
+    b2 = 0.96900 * b2 + white * 0.1538520;
+    b3 = 0.86650 * b3 + white * 0.3104856;
+    b4 = 0.55000 * b4 + white * 0.5329522;
+    b5 = -0.7616 * b5 - white * 0.0168980;
+    data[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+    data[i] *= 0.04;
+    b6 = white * 0.115926;
+  }
+
+  const noise = ctx.createBufferSource();
+  noise.buffer = buffer;
+
+  const lowpass = ctx.createBiquadFilter();
+  lowpass.type = "lowpass";
+  lowpass.frequency.setValueAtTime(220, now);
+
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.linearRampToValueAtTime(0.4, now + duration * 0.4);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+  noise.connect(lowpass);
+  lowpass.connect(gain);
+  gain.connect(ctx.destination);
+
+  noise.start(now);
+  noise.stop(now + duration);
+}
+
+// 2. FUSION : Goutte d'eau (effet plop)
+function playWaterMerge() {
+  const ctx = getAudioContext();
+  const now = ctx.currentTime;
+  const duration = 0.25;
+
+  const lowOsc = ctx.createOscillator();
+  const lowGain = ctx.createGain();
+  lowOsc.type = "sine";
+  lowOsc.frequency.setValueAtTime(140, now);
+  lowOsc.frequency.exponentialRampToValueAtTime(60, now + duration);
+
+  lowGain.gain.setValueAtTime(0.0, now);
+  lowGain.gain.linearRampToValueAtTime(0.18, now + 0.05);
+  lowGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+  const highOsc = ctx.createOscillator();
+  const highGain = ctx.createGain();
+  highOsc.type = "sine";
+  highOsc.frequency.setValueAtTime(220, now + 0.02);
+  highOsc.frequency.exponentialRampToValueAtTime(450, now + 0.15);
+
+  highGain.gain.setValueAtTime(0.0, now);
+  highGain.gain.linearRampToValueAtTime(0.12, now + 0.06);
+  highGain.gain.exponentialRampToValueAtTime(0.001, now + 0.20);
+
+  lowOsc.connect(lowGain);
+  lowGain.connect(ctx.destination);
+  highOsc.connect(highGain);
+  highGain.connect(ctx.destination);
+
+  lowOsc.start(now);
+  lowOsc.stop(now + duration);
+  highOsc.start(now + 0.02);
+  highOsc.stop(now + 0.20);
+}
+
+// 3. CHECKBOX : Tonalité de validation
+function playCheckSound() {
+  const ctx = getAudioContext();
+  const now = ctx.currentTime;
+
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+
+  osc.type = "sine";
+  osc.frequency.setValueAtTime(523.25, now);
+  osc.frequency.setValueAtTime(659.25, now + 0.06);
+
+  gain.gain.setValueAtTime(0.0, now);
+  gain.gain.linearRampToValueAtTime(0.15, now + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+
+  osc.start(now);
+  osc.stop(now + 0.18);
+}
+
+// Dictionnaires des sons restants en fichiers audio statiques
+const sounds = {
+  win: new Audio("Assets/Sounds/win.wav"),
+  gameOver: new Audio("Assets/Sounds/game-over.wav"),
+};
+
+const soundCheckbox = document.getElementById("toggle-sound");
+let isSoundEnabled = soundCheckbox ? soundCheckbox.checked : true;
 
 function setSoundActive(active) {
   isSoundEnabled = active;
 }
 
 function playSound(soundName) {
-  if (isSoundEnabled && sounds[soundName]) {
-    // Reset du temps pour permettre des sons rapides successifs
-    sounds[soundName].currentTime = 0;
-    const playPromise = sounds[soundName].play();
+  if (!isSoundEnabled) return;
 
-    // Gérer les cas où la lecture peut échouer
-    if (playPromise !== undefined) {
-      playPromise.catch((error) => {
-        console.warn(`Impossible de jouer le son "${soundName}":`, error);
-      });
-    }
+  if (soundName === "move") {
+    playWaterMove();
+  } else if (soundName === "merge") {
+    playWaterMerge();
+  } else if (soundName === "check") {
+    playCheckSound();
+  } else if (sounds[soundName]) {
+    sounds[soundName].currentTime = 0;
+    sounds[soundName].play().catch((err) => console.warn(err));
   }
 }
 
-// Optionnel : arrêter tous les sons si nécessaire
 function setSoundStop() {
   Object.values(sounds).forEach((audio) => {
     audio.pause();
     audio.currentTime = 0;
   });
 }
+
 function resetBestScore() {
   if (!confirm("Voulez-vous réinitialiser votre meilleur score ?")) return;
   localStorage.removeItem("bestScore");
