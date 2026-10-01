@@ -652,7 +652,7 @@ function moveAndStartTimer(direction) {
         restartGame();
       }
     }
-  } else if (currentMode === "Chrono") {
+  } else if (currentMode === "Chrono" || currentMode === "Hard") {
     startChronoTime();
   } else {
     stopTimer();
@@ -672,7 +672,7 @@ function updateScore(points) {
   score.textContent = currentScore;
 
   // Logique de bonus de temps (tous les 300 points) pour le mode chrono
-  if (currentMode === "Chrono") {
+  if (currentMode === "Chrono" || currentMode === "Hard") {
     let currentThreshold = Math.floor(currentScore / 300);
     if (currentThreshold > last300Points) {
       let bonus = currentThreshold - last300Points;
@@ -821,7 +821,7 @@ function continueGame() {
   if (timeCheckbox && timeCheckbox.checked) {
     startTimer();
   }
-  if (currentMode === "Chrono") {
+  if (currentMode === "Chrono" || currentMode === "Hard") {
     startChronoTime();
   }
 }
@@ -864,7 +864,7 @@ function restartGame() {
     startInvisibleMode();
   }
   stopZenTimer();
-  if (currentMode === "Zen") {
+  if (currentMode === "Zen" || currentMode === "Hard") {
     startZenTimer();
   }
   updateTimerDisplay();
@@ -883,7 +883,7 @@ function restartGame() {
   if (chronoTime.classList.contains("chrono-warning")) {
     chronoTime.classList.remove("chrono-warning");
   }
-  if (currentMode === "Chrono") {
+  if (currentMode === "Chrono" || currentMode === "Hard") {
     // Le chrono se lancera au premier mouvement via moveAndStartTimer
   }
 
@@ -1370,7 +1370,7 @@ let chronoTimeTotalSec = 0;
 let chronoTimeTotalMin = 0;
 
 function toggleChronoTimeDisplay() {
-  if (currentMode === "Chrono") {
+  if (currentMode === "Chrono" || currentMode === "Hard") {
     chronoTime.style.display = "inline-block";
   } else {
     chronoTime.style.display = "none";
@@ -1740,6 +1740,10 @@ function createToastContainer() {
   }
   return container;
 }
+
+// --- Hard ---
+
+
 
 //  Reste...
 
